@@ -2,6 +2,7 @@ package com.app.security;
 
 import com.app.model.User;
 import com.app.repo.UserRepository;
+import com.app.session.UserSessionBean;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +25,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserSessionBean userSessionBean;
 
     @Autowired
     public CustomOAuth2UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
@@ -54,6 +58,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             userRepository.save(newUser);
         }
 
+        userSessionBean.setLoggedIn(true);
+
+        //if everything is ok, return oauthUser;
         return new DefaultOAuth2User(
                 List.of(new SimpleGrantedAuthority("ROLE_USER")),
                 oauthUser.getAttributes(),
