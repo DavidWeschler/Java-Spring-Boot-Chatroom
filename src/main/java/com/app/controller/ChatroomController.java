@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.model.Chatroom;
 import com.app.model.User;
+import com.app.projection.UserProjection;
 import com.app.repo.UserRepository;
 import com.app.service.ChatroomService;
 import com.app.service.CurrentUserService;
@@ -88,15 +89,21 @@ public class ChatroomController {
                                  @RequestParam(required = false) String query,
                                  Model model) {
 
-        List<User> users = (query == null || query.isEmpty())
+        List<UserProjection> users = (query == null || query.isEmpty())
                 ? List.of()
-                : chatroomService.searchUsersToAddToGroup(chatroomId, query);
+                : chatroomService.searchUsersNotInGroup(chatroomId, query); // <--- here!
 
         model.addAttribute("users", users);
         model.addAttribute("chatroomId", chatroomId);
         model.addAttribute("query", query);
 
         return "chatroom-add-members";
+    }
+
+    @PostMapping("/{chatroomId}/add-member/{userId}")
+    public String addUserToGroup(@PathVariable Long chatroomId, @PathVariable Long userId) {
+        chatroomService.addUserToGroup(chatroomId, userId);
+        return "redirect:/chatrooms/{chatroomId}/add-members";
     }
 
 

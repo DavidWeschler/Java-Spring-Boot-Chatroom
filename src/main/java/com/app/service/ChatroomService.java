@@ -8,6 +8,7 @@ import com.app.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.app.projection.UserProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,20 +84,16 @@ public class ChatroomService {
         chatroomRepository.save(chatroom);
     }
 
-    public List<User> searchUsersToAddToGroup(Long chatroomId, String query) {
-        Chatroom chatroom = chatroomRepository.findById(chatroomId).orElseThrow();
-
-        if (chatroom.getType() != ChatroomType.GROUP) {
-            throw new IllegalStateException("Only GROUP chatrooms can add members.");
-        }
-
+    public List<UserProjection> searchUsersNotInGroup(Long chatroomId, String query) {
         return chatroomRepository.searchUsersNotInGroup(chatroomId, query);
     }
 
+    @Transactional
     public void addUserToGroup(Long chatroomId, Long userId) {
         Chatroom chatroom = chatroomRepository.findById(chatroomId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
 
+        // Optional safety: only GROUP can add
         if (chatroom.getType() != ChatroomType.GROUP) {
             throw new IllegalStateException("Only GROUP chatrooms can add members.");
         }
@@ -105,5 +102,9 @@ public class ChatroomService {
         chatroomRepository.save(chatroom);
     }
 
+
+    public List<UserProjection> searchUsersByUsername(String query) {
+        return chatroomRepository.searchUsersByUsername(query);
+    }
 
 }
