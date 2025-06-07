@@ -10,6 +10,7 @@
 <nav th:replace="fragments/navbar.html :: navbar"> </nav>
 
 <div class="container my-5">
+    <a href="/chatrooms/create" class="btn btn-success mb-4">Create New Group</a>
     <h2 class="mb-4">My Chats</h2>
 
     <div th:if="${#lists.isEmpty(chatrooms)}">
@@ -28,12 +29,6 @@
                     <!-- View Members button (always available) -->
                     <a th:href="@{/chatrooms/{id}/members(id=${chat.id})}" class="btn btn-outline-primary btn-sm">
                         View Members
-                    </a>
-
-                    <a th:href="@{/chatrooms/{id}/add-members(id=${chat.id})}"
-                       class="btn btn-outline-success btn-sm"
-                        >
-                        Add Members
                     </a>
 
                     <!-- Edit Name form (GROUP only, if editable) -->

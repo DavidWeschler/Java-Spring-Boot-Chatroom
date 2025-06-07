@@ -68,12 +68,24 @@ public class ChatroomController {
     }
 
     @GetMapping("/{chatroomId}/members")
-    public String viewChatroomMembers(@PathVariable Long chatroomId, Model model) {
+    public String viewChatroomMembers(@PathVariable Long chatroomId,
+                                      @RequestParam(required = false) String query,
+                                      Model model) {
+
         List<User> members = chatroomService.getChatroomMembers(chatroomId);
+
+        List<UserProjection> users = (query == null || query.isEmpty())
+                ? List.of()
+                : chatroomService.searchUsersNotInGroup(chatroomId, query);
+
         model.addAttribute("members", members);
+        model.addAttribute("users", users);
         model.addAttribute("chatroomId", chatroomId);
-        return "chatroom-members"; // this is your chatroom-members.html
+        model.addAttribute("query", query);
+
+        return "chatroom-members";
     }
+
 
     @PostMapping("/{chatroomId}/edit")
     public String editChatroomName(@PathVariable Long chatroomId, @RequestParam String name) {
@@ -84,27 +96,26 @@ public class ChatroomController {
         return "redirect:/chatrooms";
     }
 
-    @GetMapping("/{chatroomId}/add-members")
-    public String addMembersForm(@PathVariable Long chatroomId,
-                                 @RequestParam(required = false) String query,
-                                 Model model) {
-
-        List<UserProjection> users = (query == null || query.isEmpty())
-                ? List.of()
-                : chatroomService.searchUsersNotInGroup(chatroomId, query); // <--- here!
-
-        model.addAttribute("users", users);
-        model.addAttribute("chatroomId", chatroomId);
-        model.addAttribute("query", query);
-
-        return "chatroom-add-members";
-    }
-
     @PostMapping("/{chatroomId}/add-member/{userId}")
     public String addUserToGroup(@PathVariable Long chatroomId, @PathVariable Long userId) {
         chatroomService.addUserToGroup(chatroomId, userId);
         return "redirect:/chatrooms/{chatroomId}/add-members";
     }
 
+    @GetMapping("/create")
+    public String createGroupForm() {
+        return "chatroom-create";
+    }
 
+    @PostMapping("/create")
+    public String createGroup(@RequestParam String name,
+                              @RequestParam(required = false) boolean editableName) {
+
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
+
+        chatroomService.createGroup(name, editableName, user);
+
+        return "redirect:/chatrooms";
+    }
 }

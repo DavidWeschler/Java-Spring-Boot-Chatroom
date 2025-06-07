@@ -107,4 +107,16 @@ public class ChatroomService {
         return chatroomRepository.searchUsersByUsername(query);
     }
 
+    @Transactional
+    public void createGroup(String name, boolean editableName, User creator) {
+        Chatroom chatroom = new Chatroom();
+        chatroom.setName(name);
+        chatroom.setType(ChatroomType.GROUP);
+        chatroom.setEditableName(editableName);
+        chatroom.setCreatedBy(creator);
+        chatroom.getMembers().add(creator); // Creator is first member
+
+        chatroomRepository.save(chatroom);
+    }
+
 }
