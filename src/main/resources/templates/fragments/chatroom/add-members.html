@@ -1,8 +1,19 @@
-<div th:fragment="addMembers(chatroomId, query, users)" class="container my-5">
+<div th:fragment="addMembers(chatroomId, query, users, searchAction, btnAction, btnTitle)" class="container my-5">
     <hr>
+
+    <div class="i-am-debug-erase-me">
+        <h6>chatroomId: <span th:text="${chatroomId}"></span></h6>
+        <h6>query: <span th:text="${query}"></span></h6>
+        <h6>users: <span th:text="${users}"></span></h6>
+        <h6>searchAction: <span th:text="${searchAction}"></span></h6>
+        <h6>btnAction: <span th:text="${btnAction}"></span></h6>
+        <h6>btnTitle: <span th:text="${btnTitle}"></span></h6>
+    </div>
+
     <h4 class="mt-4">Add Members</h4>
 
-    <form class="mb-4" th:action="@{/chatrooms/{id}/search-members(id=${chatroomId})}" method="get">
+<!--    <form class="mb-4" th:action="@{/chatrooms/{id}/search-members(id=${chatroomId})}" method="get">-->
+    <form class="mb-4" th:action="@{${searchAction}}" method="get">
         <div class="input-group">
             <input type="text" name="query" class="form-control" placeholder="Search users..."
                    th:value="${query}">
@@ -25,8 +36,10 @@
                 <td th:text="${user.username}"></td>
                 <td th:text="${user.email}"></td>
                 <td>
-                    <form th:action="@{/chatrooms/{chatroomId}/add-member/{userId}(chatroomId=${chatroomId}, userId=${user.id})}" method="post">
-                        <button type="submit" class="btn btn-success btn-sm">Add</button>
+<!--                    <form th:action="@{/chatrooms/{chatroomId}/add-member/{userId}(chatroomId=${chatroomId}, userId=${user.id})}" method="post">-->
+                    <form th:action="@{${btnAction}}" method="post">
+<!--                        <button type="submit" class="btn btn-success btn-sm">Add</button>-->
+                        <button type="submit" class="btn btn-success btn-sm" th:text="${btnTitle}"></button>
                     </form>
                 </td>
             </tr>

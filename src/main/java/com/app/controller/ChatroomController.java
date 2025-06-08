@@ -66,7 +66,7 @@ public class ChatroomController {
     }
 
     @GetMapping("/{chatroomId}/search-members")
-    public String viewChatroomMembers(@PathVariable Long chatroomId,
+    public String searchMembers(@PathVariable Long chatroomId,
                                       @RequestParam(required = false) String query,
                                       Model model) {
 
