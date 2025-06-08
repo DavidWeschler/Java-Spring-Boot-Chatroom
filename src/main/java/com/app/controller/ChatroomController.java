@@ -92,6 +92,7 @@ public class ChatroomController {
                 .map(Enum::toString)
                 .orElse("UNKNOWN"));
         System.out.println("now im supposed to show the chatroom manage page");
+        model.addAttribute("editNameMode", false);
         return "chatroom-manage";   // might not always be this
     }
 
@@ -190,10 +191,14 @@ public class ChatroomController {
     @GetMapping("/{chatroomId}/manage")
     public String manageChatroom(@PathVariable Long chatroomId,
                                  @RequestParam(required = false) String query,
+                                 @RequestParam(name = "editName", defaultValue = "false") String editNameParam,
                                  Model model) {
+
+        boolean editNameMode = "true".equalsIgnoreCase(editNameParam);
 
         chatroomService.requireMembershipOrThrow(chatroomId);
         Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
+
         model.addAttribute("chatroomId", chatroomId);
         model.addAttribute("chatroomType", chatroom.getType().toString());
 
@@ -207,8 +212,14 @@ public class ChatroomController {
                 : chatroomService.searchUsersNotInGroup(chatroomId, query);
         model.addAttribute("query", query);
         model.addAttribute("users", users);
+
+        // Chatroom object + editNameMode flag
         model.addAttribute("chatroom", chatroom);
+        model.addAttribute("editNameMode", editNameMode);
+        System.out.println("DEBUG: editNameParam = " + editNameParam);
         return "chatroom-manage";
     }
+
+
 
 }

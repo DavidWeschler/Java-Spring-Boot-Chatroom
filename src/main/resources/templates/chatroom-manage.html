@@ -16,20 +16,26 @@
         <button type="submit" class="btn btn-danger">Leave Chatroom</button>
     </form>
 
-    <div class="chatroom-toolbar mb-4">
-        <h2>
-        <span th:if="${true or chatroom.type == 'GROUP' and chatroom.editableName}">
+    <h2>
+        <div style="color: red;">DEBUG editNameMode: <span th:text="${editNameMode}"></span></div>
+        <span th:if="${chatroom.type == T(com.app.model.ChatroomType).GROUP and chatroom.editableName}">
+        <span th:if="${!editNameMode}">
+            <span th:text="${chatroom.name}">Chatroom Name</span>
+            <a th:href="@{'/chatrooms/' + ${chatroom.id} + '/manage?(editName=true)'}" class="btn btn-secondary btn-sm ms-2">Edit</a>
+        </span>
+        <span th:if="${editNameMode}">
             <form th:action="@{/chatrooms/{id}/edit(id=${chatroom.id})}" method="post" class="d-inline">
                 <input type="text" name="name" th:value="${chatroom.name}" required
                        class="form-control d-inline-block w-auto" style="display: inline; width: auto;" />
                 <button type="submit" class="btn btn-primary btn-sm">Save</button>
             </form>
         </span>
-        </h2>
-    </div>
+    </span>
+        <span th:if="${!(chatroom.type == T(com.app.model.ChatroomType).GROUP and chatroom.editableName)}" th:text="${chatroom.name}">Chatroom Name</span>
+    </h2>
 
 
-    <div th:replace="~{fragments/chatroom/chatroom-managment :: chatroomManagment(${chatroomType})}"></div>
+    <div th:replace="~{fragments/chatroom/chatroom-managment :: chatroomManagment(${chatroomType}, ${chatroomId}, ${editNameMode})}"></div>
 </div>
 
 <footer th:replace="~{fragments/footer.html :: footer}"> </footer>

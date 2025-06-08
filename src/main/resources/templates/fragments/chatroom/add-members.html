@@ -12,7 +12,7 @@
 
     <h4 class="mt-4">Add Members</h4>
 
-<!--    <form class="mb-4" th:action="@{/chatrooms/{id}/search-members(id=${chatroomId})}" method="get">-->
+    <!-- <form class="mb-4" th:action="@{/chatrooms/{id}/search-members(id=${chatroomId})}" method="get">-->
     <form class="mb-4" th:action="@{${searchAction}}" method="get">
         <div class="input-group">
             <input type="text" name="query" class="form-control" placeholder="Search users..."
@@ -36,9 +36,9 @@
                 <td th:text="${user.username}"></td>
                 <td th:text="${user.email}"></td>
                 <td>
-<!--                    <form th:action="@{/chatrooms/{chatroomId}/add-member/{userId}(chatroomId=${chatroomId}, userId=${user.id})}" method="post">-->
+                    <!-- <form th:action="@{/chatrooms/{chatroomId}/add-member/{userId}(chatroomId=${chatroomId}, userId=${user.id})}" method="post">-->
                     <form th:action="@{${btnAction} + ${user.id}}" method="post">
-                    <!--                        <button type="submit" class="btn btn-success btn-sm">Add</button>-->
+                    <!-- <button type="submit" class="btn btn-success btn-sm">Add</button>-->
                         <button type="submit" class="btn btn-success btn-sm" th:text="${btnTitle}"></button>
                     </form>
                 </td>

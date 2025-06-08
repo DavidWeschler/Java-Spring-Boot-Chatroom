@@ -1,5 +1,5 @@
-<div th:fragment="chatroomManagment(chatroomType)">
-    <div class="container my-5">
+<div th:fragment="chatroomManagment(chatroomType, chatroomId, editNameMode)">
+<div class="container my-5">
         <div th:replace="fragments/chatroom/show-members :: chatroomMembers"></div>
     </div>
     <div th:if="${chatroomType == 'GROUP'}">
