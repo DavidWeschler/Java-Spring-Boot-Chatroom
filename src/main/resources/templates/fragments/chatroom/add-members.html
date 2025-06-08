@@ -37,8 +37,8 @@
                 <td th:text="${user.email}"></td>
                 <td>
 <!--                    <form th:action="@{/chatrooms/{chatroomId}/add-member/{userId}(chatroomId=${chatroomId}, userId=${user.id})}" method="post">-->
-                    <form th:action="@{${btnAction}}" method="post">
-<!--                        <button type="submit" class="btn btn-success btn-sm">Add</button>-->
+                    <form th:action="@{${btnAction} + ${user.id}}" method="post">
+                    <!--                        <button type="submit" class="btn btn-success btn-sm">Add</button>-->
                         <button type="submit" class="btn btn-success btn-sm" th:text="${btnTitle}"></button>
                     </form>
                 </td>

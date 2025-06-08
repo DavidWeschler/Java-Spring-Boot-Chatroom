@@ -73,6 +73,7 @@ public class ChatroomController {
                                       Model model) {
 
         User user = chatroomService.requireMembershipOrThrow(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
         List<User> members = chatroomService.getChatroomMembers(chatroomId);
         List<UserProjection> users = (query == null || query.isEmpty())
                 ? List.of()
@@ -81,6 +82,7 @@ public class ChatroomController {
         // prints the users found
         users.forEach(u -> System.out.println("User found: " + u.getUsername()));
 
+        model.addAttribute("chatroom", chatroom);
         model.addAttribute("members", members);
         model.addAttribute("users", users);
         model.addAttribute("chatroomId", chatroomId);
@@ -89,7 +91,7 @@ public class ChatroomController {
                 .map(Chatroom::getType)
                 .map(Enum::toString)
                 .orElse("UNKNOWN"));
-
+        System.out.println("now im supposed to show the chatroom manage page");
         return "chatroom-manage";   // might not always be this
     }
 
@@ -135,18 +137,20 @@ public class ChatroomController {
     }
 
     @PostMapping("/{chatroomId}/edit")
-    public String editChatroomName(@PathVariable Long chatroomId, @RequestParam String name) {
+    public String editChatroomName(@PathVariable Long chatroomId, @RequestParam String name, Model model) {
         User user = chatroomService.requireMembershipOrThrow(chatroomId);
 
-        chatroomService.editChatroomName(chatroomId, user.getId(), name);
+        Chatroom chatroom = chatroomService.editChatroomName(chatroomId, user.getId(), name);
+        model.addAttribute("chatroom", chatroom);
         return "redirect:/chatrooms/" + chatroomId + "/manage";
     }
 
     @PostMapping("/{chatroomId}/add-member/{userId}")
-    public String addUserToGroup(@PathVariable Long chatroomId, @PathVariable Long userId) {
+    public String addUserToGroup(@PathVariable Long chatroomId, @PathVariable Long userId, Model model) {
         chatroomService.requireMembershipOrThrow(chatroomId);
-
+        Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
         chatroomService.addUserToGroup(chatroomId, userId);
+        model.addAttribute("chatroom", chatroom);
         return "redirect:/chatrooms/" + chatroomId + "/manage";
     }
 
@@ -203,7 +207,7 @@ public class ChatroomController {
                 : chatroomService.searchUsersNotInGroup(chatroomId, query);
         model.addAttribute("query", query);
         model.addAttribute("users", users);
-
+        model.addAttribute("chatroom", chatroom);
         return "chatroom-manage";
     }
 

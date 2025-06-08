@@ -58,7 +58,7 @@ public class ChatroomService {
         return List.copyOf(chatroom.getMembers());
     }
 
-    public void editChatroomName(Long chatroomId, Long userId, String newName) {
+    public Chatroom editChatroomName(Long chatroomId, Long userId, String newName) {
         Chatroom chatroom = chatroomRepository.findById(chatroomId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
 
@@ -76,6 +76,7 @@ public class ChatroomService {
 
         chatroom.setName(newName);
         chatroomRepository.save(chatroom);
+        return chatroom;
     }
 
     public void leaveChatroom(Long chatroomId, Long userId) {
