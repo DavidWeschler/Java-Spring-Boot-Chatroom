@@ -65,6 +65,32 @@ public class ChatroomController {
         return "redirect:/home";    // Placeholder for actual conversation start logic
     }
 
+    @GetMapping("/{chatroomId}/search-members")
+    public String viewChatroomMembers(@PathVariable Long chatroomId,
+                                      @RequestParam(required = false) String query,
+                                      Model model) {
+
+        User user = chatroomService.requireMembershipOrThrow(chatroomId);
+        List<User> members = chatroomService.getChatroomMembers(chatroomId);
+        List<UserProjection> users = (query == null || query.isEmpty())
+                ? List.of()
+                : chatroomService.searchUsersNotInGroup(chatroomId, query);
+
+        // prints the users found
+        users.forEach(u -> System.out.println("User found: " + u.getUsername()));
+
+        model.addAttribute("members", members);
+        model.addAttribute("users", users);
+        model.addAttribute("chatroomId", chatroomId);
+        model.addAttribute("query", query);
+        model.addAttribute("chatroomType", chatroomService.findById(chatroomId)
+                .map(Chatroom::getType)
+                .map(Enum::toString)
+                .orElse("UNKNOWN"));
+
+        return "chatroom-manage";   // might not always be this
+    }
+
     //---------------------------------------------------------
     @GetMapping("")
     public String myChatrooms(Model model) {
