@@ -10,10 +10,13 @@
 <nav th:replace="~{fragments/navbar.html :: navbar}"> </nav>
 
 <div class="container my-5">
-    <a th:href="@{/chatrooms}" class="btn btn-secondary mb-4">Back to My Chats</a>
+    <a href="javascript:history.back()" class="btn btn-secondary mb-4">Back</a>
 
-    <!-- Use your chatroomManagment fragment -->
-    <div th:replace="~{fragments/chatroom-managment :: chatroomManagment(${chatroomType})}"></div>
+    <form th:action="@{/chatrooms/leave/{id}(id=${chatroomId})}" method="post" class="d-inline">
+        <button type="submit" class="btn btn-danger">Leave Chatroom</button>
+    </form>
+
+    <div th:replace="~{fragments/chatroom/chatroom-managment :: chatroomManagment(${chatroomType})}"></div>
 </div>
 
 <footer th:replace="~{fragments/footer.html :: footer}"> </footer>
