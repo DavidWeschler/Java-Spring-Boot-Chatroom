@@ -110,7 +110,7 @@ public class ChatroomService {
     }
 
     @Transactional
-    public void createGroup(String name, boolean editableName, User creator) {
+    public Chatroom createGroup(String name, boolean editableName, User creator) {
         Chatroom chatroom = new Chatroom();
         chatroom.setName(name);
         chatroom.setType(ChatroomType.GROUP);
@@ -118,7 +118,8 @@ public class ChatroomService {
         chatroom.setCreatedBy(creator);
         chatroom.getMembers().add(creator);
 
-        chatroomRepository.save(chatroom);
+        Chatroom savedChatroom = chatroomRepository.save(chatroom);
+        return savedChatroom;
     }
 
     public boolean isUserMemberOfChatroom(Long chatroomId, Long useId) {

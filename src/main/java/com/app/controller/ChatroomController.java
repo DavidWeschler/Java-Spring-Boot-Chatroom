@@ -138,9 +138,9 @@ public class ChatroomController {
         OAuth2User currentUser = currentUserService.getCurrentUser();
         User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
 
-        chatroomService.createGroup(name, editableName, user);
+        Chatroom chatroom = chatroomService.createGroup(name, editableName, user);
 
-        return "redirect:/chatrooms";
+        return "redirect:/chatrooms/" + chatroom.getId() + "/view-chatroom";
     }
 
     @GetMapping("/{chatroomId}/view-chatroom")
