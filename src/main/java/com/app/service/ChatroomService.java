@@ -13,6 +13,7 @@ import com.app.projection.UserProjection;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -139,6 +140,39 @@ public class ChatroomService {
             throw new AccessDeniedException("You are not a member of this chatroom.");
         }
         return user;
+    }
+
+    public Chatroom createCommunity(String name, User user) {
+        Chatroom chatroom = new Chatroom();
+        chatroom.setName(name);
+        chatroom.setType(ChatroomType.COMMUNITY);
+        chatroom.setEditableName(false);
+        chatroom.setCreatedBy(user);
+        chatroom.getMembers().add(user);
+
+        return chatroomRepository.save(chatroom);
+    }
+
+    public Chatroom findOrCreatePrivateChat(Long myId, long otherId) {
+        User myUser = userRepository.findById(myId).orElseThrow();
+        User otherUser = userRepository.findById(otherId).orElseThrow();
+
+        Set<Long> memberIds = Set.of(myId, otherId);
+        List<Chatroom> existingChats = chatroomRepository.findPrivateChatByMembers(memberIds, memberIds.size());
+
+        if (!existingChats.isEmpty()) {
+            return existingChats.get(0);
+        }
+
+        Chatroom chatroom = new Chatroom();
+        chatroom.setName(myUser.getUsername() + " & " + otherUser.getUsername());
+        chatroom.setType(ChatroomType.PRIVATE);
+        chatroom.setEditableName(false);
+        chatroom.setCreatedBy(myUser);
+        chatroom.getMembers().add(myUser);
+        chatroom.getMembers().add(otherUser);
+
+        return chatroomRepository.save(chatroom);
     }
 
 }

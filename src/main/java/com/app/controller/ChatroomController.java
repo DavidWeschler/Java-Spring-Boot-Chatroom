@@ -46,17 +46,18 @@ public class ChatroomController {
     }
 
     @PostMapping("/conversations/start/{userId}")
-    public String startConversation(@PathVariable Long userId,
-                                    @AuthenticationPrincipal User currentUser) {
+    public String startConversation(@PathVariable String userId) {
+        System.out.println("starting conversation with userId: " + userId);
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
 
-        System.out.println("now im supposed to show the start conversation page");
-        if (currentUser.getId().equals(userId)) {
+        if (user.getId().toString().equals(userId)) {
+            System.out.println("error, cannot start conversation with self");
             return "redirect:/home"; // Cannot start a convo with self
         }
 
-//        Chatroom chat = chatroomService.findOrCreatePrivateChat(currentUser.getId(), userId);
-//        return "redirect:/chatrooms/" + chat.getId();
-        return "redirect:/home";    // Placeholder for actual conversation start logic
+        Chatroom chat = chatroomService.findOrCreatePrivateChat(user.getId(), Long.parseLong(userId));
+        return "redirect:/chatrooms/" + chat.getId() + "/view-chatroom";
     }
 
     @GetMapping("/{chatroomId}/search-members")
@@ -85,7 +86,23 @@ public class ChatroomController {
                 .orElse("UNKNOWN"));
         System.out.println("now im supposed to show the chatroom manage page");
         model.addAttribute("editNameMode", false);
-        return "chatroom-manage";   // might not always be this
+        return "chatroom-manage";
+    }
+
+    @GetMapping("/create-community")
+    public String createCommunity() {
+        return "chatroom-create-community";
+    }
+
+    @PostMapping("/create-community")
+    public String createCommunity(@RequestParam String name,
+                                  @RequestParam(required = false) boolean editableName) {
+        System.out.println("creating community with name: " + name);
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
+
+        Chatroom chatroom = chatroomService.createCommunity(name, user);
+        return "redirect:/chatrooms/" + chatroom.getId() + "/view-chatroom";
     }
 
     //---------------------------------------------------------
@@ -157,6 +174,7 @@ public class ChatroomController {
         return "start-conversation";
     }
 
+    // this needs to be changed to be called "create-group"
     @PostMapping("/create")
     public String createGroup(@RequestParam String name,
                               @RequestParam(required = false) boolean editableName) {
@@ -211,7 +229,4 @@ public class ChatroomController {
         System.out.println("DEBUG: editNameParam = " + editNameParam);
         return "chatroom-manage";
     }
-
-
-
 }

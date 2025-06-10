@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.app.projection.UserProjection;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
@@ -36,5 +37,9 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             ")")
     List<UserProjection> searchUsersNotInGroup(@Param("chatroomId") Long chatroomId, @Param("query") String query);
 
+    @Query("SELECT c FROM Chatroom c JOIN c.members m WHERE m.id IN :memberIds " +
+            "GROUP BY c.id HAVING COUNT(m) = :memberCount")
+    List<Chatroom> findPrivateChatByMembers(@Param("memberIds") Set<Long> memberIds,
+                                            @Param("memberCount") long memberCount);
 
 }
