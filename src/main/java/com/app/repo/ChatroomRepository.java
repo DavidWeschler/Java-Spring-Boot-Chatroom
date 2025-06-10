@@ -20,7 +20,8 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
     List<Chatroom> findByMembers_Id(Long userId);
 
-    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY' AND :userId NOT IN (SELECT u.id FROM c.members u)")
+//    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY' AND :userId NOT IN (SELECT u.id FROM c.members u)")   // uncomment this after debug
+    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY'")     // for debug - show all communities
     List<Chatroom> findCommunitiesNotJoinedByUser(@Param("userId") Long userId);
 
     @Query("SELECT u.id AS id, u.username AS username, u.email AS email " +
@@ -37,9 +38,12 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             ")")
     List<UserProjection> searchUsersNotInGroup(@Param("chatroomId") Long chatroomId, @Param("query") String query);
 
-    @Query("SELECT c FROM Chatroom c JOIN c.members m WHERE m.id IN :memberIds " +
-            "GROUP BY c.id HAVING COUNT(m) = :memberCount")
+    @Query("SELECT c FROM Chatroom c JOIN c.members m " +
+            "WHERE m.id IN :memberIds " +
+            "GROUP BY c.id " +
+            "HAVING COUNT(m) = :memberCount AND c.type = :type")
     List<Chatroom> findPrivateChatByMembers(@Param("memberIds") Set<Long> memberIds,
-                                            @Param("memberCount") long memberCount);
+                                            @Param("memberCount") long memberCount,
+                                            @Param("type") ChatroomType type);
 
 }

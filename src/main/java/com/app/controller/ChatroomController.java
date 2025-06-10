@@ -105,6 +105,17 @@ public class ChatroomController {
         return "redirect:/chatrooms/" + chatroom.getId() + "/view-chatroom";
     }
 
+    @GetMapping("/getCommunities")
+    public String getCommunities(Model model) {
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
+
+        List<Chatroom> communities = chatroomService.findDiscoverableCommunities(user.getId());
+        model.addAttribute("communities", communities);
+
+        return "discover";
+    }
+
     //---------------------------------------------------------
     @GetMapping("")
     public String myChatrooms(Model model) {
