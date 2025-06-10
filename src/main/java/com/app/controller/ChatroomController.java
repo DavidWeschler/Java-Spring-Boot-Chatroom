@@ -32,24 +32,16 @@ public class ChatroomController {
 
     @GetMapping("/conversations/start")
     public String showStartConversationPage(@RequestParam(value = "query", required = false) String query, Model model) {
-        User currentUser = currentUserService.getCurrentAppUser();
+        User currentUser = currentUserService.getCurrentAppUser();  // maybe move to an interceptor
 
-//        if (currentUser == null) {
-//            return "redirect:/login"; // or error page
-//        }
-
-        List<User> users;
+        List<User> users = List.of();
         if (query != null && !query.trim().isEmpty()) {
             users = userRepository.findByUsernameContainingIgnoreCase(query);
-        }
-        else {
-            users = userRepository.findRandomUsersExcluding(currentUser.getId(), 10);
         }
 
         model.addAttribute("query", query);
         model.addAttribute("users", users);
 
-        System.out.println("now im supposed to show the start conversation page");
         return "start-conversation";
     }
 

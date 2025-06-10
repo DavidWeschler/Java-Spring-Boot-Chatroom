@@ -29,4 +29,13 @@ public class SearchController {
 
         return "search";
     }
+
+    @GetMapping("/start-convo-search")
+    public String startConvoSearch(@RequestParam("query") String query, Model model) {
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(query);
+        model.addAttribute("users", users);
+        model.addAttribute("query", query);
+
+        return "start-conversation";
+    }
 }

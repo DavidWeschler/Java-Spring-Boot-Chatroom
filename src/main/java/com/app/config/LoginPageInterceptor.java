@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+// @Configuration
 @Component
 public class LoginPageInterceptor implements HandlerInterceptor {
 

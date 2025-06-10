@@ -10,8 +10,7 @@
 <nav th:replace="~{fragments/navbar.html :: navbar}"> </nav>
 
 <div class="container my-5">
-    <a href="javascript:history.back()" class="btn btn-secondary mb-4">Back</a>
-
+    <a th:href="@{/chatrooms/{id}/view-chatroom(id=${chatroom.id})}" class="btn btn-secondary mb-4">Back</a>
     <form th:action="@{/chatrooms/leave/{id}(id=${chatroomId})}" method="post" class="d-inline">
         <button type="submit" class="btn btn-danger">Leave Chatroom</button>
     </form>

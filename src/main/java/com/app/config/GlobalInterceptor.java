@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+// @Configuration
 public class GlobalInterceptor implements HandlerInterceptor {
 
     private final UserSessionBean userSessionBean;
@@ -46,4 +47,9 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
         return true; // Allow request to proceed
     }
+
+
+    /**
+     * CHECK IF WE NEED postHandle() TOO
+     */
 }
