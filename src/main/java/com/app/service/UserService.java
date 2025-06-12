@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,15 +54,11 @@ public class UserService {
         });
     }
 
-    public boolean usernameExists(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    public Optional<User> findByUsername(String username) {
+    public List<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -69,3 +66,4 @@ public class UserService {
         return userRepository.findByGoogleId(googleId);
     }
 }
+
