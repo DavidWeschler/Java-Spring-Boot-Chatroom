@@ -53,6 +53,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+
     @ManyToMany(mappedBy = "members")
     private Set<Chatroom> chatrooms = new HashSet<>();
 }
