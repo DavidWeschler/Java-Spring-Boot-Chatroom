@@ -21,3 +21,4 @@ public class UserSessionBean {
         this.loggedIn = loggedIn;
     }
 }
+
