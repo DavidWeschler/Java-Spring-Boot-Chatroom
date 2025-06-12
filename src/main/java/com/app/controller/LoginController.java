@@ -26,10 +26,11 @@ public class LoginController {
         return "login";
     }
 
-    @PostMapping("/logout-success")
+    @PostMapping("/logout")
     public String logoutSuccess(HttpSession session) {
         userSessionBean.setLoggedIn(false);
-        session.setAttribute("showLogoutMessage", true);
+        session.setAttribute("logoutMessage", true);
+        System.out.println("Logged out successfully SDF");
         return "redirect:/login";
     }
 
