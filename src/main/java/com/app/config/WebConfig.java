@@ -17,4 +17,5 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new GlobalInterceptor(userSessionBean))
                 .addPathPatterns("/**"); // Apply to all paths
     }
+
 }

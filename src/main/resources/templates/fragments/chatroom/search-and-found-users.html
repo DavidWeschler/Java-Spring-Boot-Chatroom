@@ -20,15 +20,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.email}"></td>
-                <td>
-                    <form th:action="@{${btnAction} + ${user.id}}" method="post">
-                        <button type="submit" class="btn btn-success btn-sm" th:text="${btnTitle}"></button>
-                    </form>
-                </td>
-            </tr>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td>
+                        <form th:action="@{${btnAction} + ${user.id}}" method="post">
+                            <button type="submit" class="btn btn-success btn-sm" th:text="${btnTitle}"></button>
+                        </form>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

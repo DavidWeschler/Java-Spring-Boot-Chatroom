@@ -51,7 +51,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         if (existingUser.isEmpty()) {
             User newUser = new User();
-            newUser.setGoogleId(googleId);
+            newUser.setGoogleId(googleId);  // Set Google ID
             newUser.setEmail(email);
             newUser.setUsername(name);
             newUser.setAvatarId(avatar);

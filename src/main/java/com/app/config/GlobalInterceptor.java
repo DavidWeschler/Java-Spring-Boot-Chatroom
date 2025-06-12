@@ -47,8 +47,6 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
         return true; // Allow request to proceed
     }
-
-
     /**
      * CHECK IF WE NEED postHandle() TOO
      */

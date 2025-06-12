@@ -33,5 +33,4 @@ public class HomeController {
     public String confirmLogout() {
         return "logout-confirm"; // renders logout-confirm.html
     }
-
 }

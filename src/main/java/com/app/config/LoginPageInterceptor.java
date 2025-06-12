@@ -12,7 +12,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class LoginPageInterceptor implements HandlerInterceptor {
 
-
     /**
      * NOTE - WE NEVER GWT HERE. IT'S A BUG. MUST CHECK WHY.
      */

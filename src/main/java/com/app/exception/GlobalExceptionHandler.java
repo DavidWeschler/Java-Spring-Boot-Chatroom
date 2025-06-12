@@ -14,4 +14,5 @@ public class GlobalExceptionHandler {
 
         return "redirect:/chatrooms"; // or return "error/403";
     }
+
 }

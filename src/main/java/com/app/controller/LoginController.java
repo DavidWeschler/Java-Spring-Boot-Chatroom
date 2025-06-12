@@ -37,5 +37,4 @@ public class LoginController {
     public String logoutConfirm() {
         return "logout-confirm";
     }
-
 }

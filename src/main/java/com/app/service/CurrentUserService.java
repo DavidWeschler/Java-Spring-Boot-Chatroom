@@ -32,4 +32,5 @@ public class CurrentUserService {
         String email = oAuth.getAttribute("email");   // adjust key if provider differs
         return email == null ? null : userRepository.findByEmail(email).orElse(null);
     }
+
 }
