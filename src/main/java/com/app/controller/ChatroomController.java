@@ -2,19 +2,24 @@ package com.app.controller;
 
 import com.app.model.Chatroom;
 import com.app.model.ChatroomType;
+import com.app.model.Message;
 import com.app.model.User;
 import com.app.projection.UserProjection;
+import com.app.repo.MessageRepository;
 import com.app.repo.UserRepository;
 import com.app.service.ChatroomService;
 import com.app.service.CurrentUserService;
+import com.app.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -29,6 +34,33 @@ public class ChatroomController {
 
     @Autowired
     private CurrentUserService currentUserService;
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @Autowired
+    private MessageService messageService;
+
+    @PostMapping("/{chatroomId}/send-message")
+    public String sendMessage(@PathVariable Long chatroomId,
+                              @RequestParam("message") String content,
+                              RedirectAttributes redirectAttributes) {
+
+        if (content.length() > 255) {
+            redirectAttributes.addFlashAttribute("error", "Message must be 255 characters or less.");
+            return "redirect:/chatrooms/" + chatroomId + "/view-chatroom";
+        }
+
+        User user = chatroomService.requireMembershipOrThrow(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId)
+                .orElseThrow(() -> new IllegalArgumentException("Chatroom not found"));
+
+        messageService.sendMessageToChatroom(content, chatroom, user);
+
+        return "redirect:/chatrooms/" + chatroomId + "/view-chatroom";
+    }
+
+
 
     @GetMapping("/conversations/start")
     public String showStartConversationPage(@RequestParam(value = "query", required = false) String query, Model model) {
@@ -215,12 +247,11 @@ public class ChatroomController {
         chatroomService.requireMembershipOrThrow(chatroomId);
 
         Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
+
+        List<Message> messages = messageRepository.findByChatroomOrderByTimestampAsc(chatroom);
+
         model.addAttribute("chatroomId", chatroomId);
         model.addAttribute("chatroomType", chatroom.getType().toString());
-
-
-        // create an emty list od dtrings called messages
-        List<String> messages = List.of();
         model.addAttribute("messages", messages);
 
         return "view-chatroom";
