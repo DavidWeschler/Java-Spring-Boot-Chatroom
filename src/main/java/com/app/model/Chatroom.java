@@ -46,9 +46,4 @@ public class Chatroom {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> members = new HashSet<>();
-
-    @Transient
-    public int getNumOfMembers() {
-        return members.size();
-    }
 }

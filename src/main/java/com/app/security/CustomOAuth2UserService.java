@@ -40,18 +40,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
         OAuth2User oauthUser = new DefaultOAuth2UserService().loadUser(request);
 
-        String googleId = oauthUser.getAttribute("sub");   // Unique Google ID
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
         String avatar = oauthUser.getAttribute("picture");
-
-        Optional<User> existingUser = userRepository.findByGoogleId(googleId);  // Find by googleId, not email
+        Optional<User> existingUser = userRepository.findByEmail(email);
 
         System.out.println("User exists? " + existingUser.isPresent());
 
         if (existingUser.isEmpty()) {
             User newUser = new User();
-            newUser.setGoogleId(googleId);
             newUser.setEmail(email);
             newUser.setUsername(name);
             newUser.setAvatarId(avatar);
@@ -63,7 +60,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         userSessionBean.setLoggedIn(true);
 
-        // Return the OAuth2User with authorities and attributes
+        //if everything is ok, return oauthUser;
         return new DefaultOAuth2User(
                 List.of(new SimpleGrantedAuthority("ROLE_USER")),
                 oauthUser.getAttributes(),

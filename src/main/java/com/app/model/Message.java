@@ -30,8 +30,14 @@ public class Message {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 
+    @OneToOne
+    @JoinColumn(name = "file_id")
+    private File file;
+
     public String getSenderName() {
         return sender != null ? sender.getUsername() : "Unknown";
     }
+
+    public void setFile(File file) { this.file = file; }
 
 }

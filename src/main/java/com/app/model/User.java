@@ -2,23 +2,17 @@ package com.app.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.HashSet;
+
+
 
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "googleId")
-})
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -26,7 +20,7 @@ public class User {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Email
@@ -42,9 +36,6 @@ public class User {
     @Column(nullable = false)
     private String role; // "USER" or "ADMIN"
 
-    @Column(nullable = false, unique = true)
-    private String googleId;
-
     private String avatarId;
 
     @CreationTimestamp
@@ -53,7 +44,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-
     @ManyToMany(mappedBy = "members")
     private Set<Chatroom> chatrooms = new HashSet<>();
+
 }
