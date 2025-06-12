@@ -52,3 +52,4 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             "AND :userId NOT IN (SELECT m.id FROM c.members m)")
     List<Chatroom> searchCommunities(String query, Long userId);
 }
+

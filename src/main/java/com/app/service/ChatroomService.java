@@ -183,4 +183,5 @@ public class ChatroomService {
         }
         return chatroomRepository.searchCommunities(query, userId);
     }
+
 }
