@@ -1,9 +1,11 @@
 package com.app.session;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
+@Getter
 @Component
 @SessionScope
 public class UserSessionBean {
@@ -13,10 +15,6 @@ public class UserSessionBean {
     @PostConstruct
     public void init() {
         loggedIn = false;
-    }
-
-    public boolean isLoggedIn() {
-        return loggedIn;
     }
 
     public void setLoggedIn(boolean loggedIn) {

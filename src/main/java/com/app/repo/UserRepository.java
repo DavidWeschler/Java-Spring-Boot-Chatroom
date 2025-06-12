@@ -14,9 +14,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByUsername(String username); // Not unique anymore
 
     Optional<User> findByEmail(String email);
+
     boolean existsByEmail(String email);
 
     Optional<User> findByGoogleId(String googleId);
+
     boolean existsByGoogleId(String googleId);
 
     List<User> findByUsernameContainingIgnoreCase(String query);
@@ -24,3 +26,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM users WHERE id <> :currentUserId ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<User> findRandomUsersExcluding(@Param("currentUserId") Long currentUserId, @Param("limit") int limit);
 }
+
