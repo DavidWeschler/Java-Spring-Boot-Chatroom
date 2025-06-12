@@ -16,7 +16,7 @@
     <h4 class="mt-4">Find a community</h4>
 
     <!-- Search Form -->
-    <form class="mb-4" th:action="@{/}" method="get">
+    <form class="mb-4" th:action="@{/chatrooms/search-community}" method="get">
         <div class="input-group">
             <label>
                 <input type="text" name="query" class="form-control" placeholder="Search communities..."
@@ -27,7 +27,7 @@
     </form>
 
     <!-- Results Table -->
-    <div th:if="${!#lists.isEmpty(communities)}">
+    <div th:if="${!#lists.isEmpty(foundCommunities)}">
         <h4>Found Communities:</h4>
         <table class="table table-striped">
             <thead>
@@ -38,12 +38,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="community : ${communities}">
+            <tr th:each="community : ${foundCommunities}">
                 <td th:text="${community.name}"></td>
 <!--                <td th:text="${community.numOfMembers}"></td>-->
                 <td>-1</td>
                 <td>
-                    <form th:action="@{'/' + ${community.id}}" method="post">
+                    <form th:action="@{/chatrooms/join/{id}(id=${community.id})}" method="post">
                         <button type="submit" class="btn btn-success btn-sm">Join</button>
                     </form>
                 </td>

@@ -177,4 +177,10 @@ public class ChatroomService {
         return chatroomRepository.save(chatroom);
     }
 
+    public List<Chatroom> searchCommunities(String query, Long userId) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        return chatroomRepository.searchCommunities(query, userId);
+    }
 }

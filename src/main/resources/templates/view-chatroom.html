@@ -2,28 +2,66 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Chatroom Members - WhatsApp SN</title>
+    <title>Chatroom - WhatsApp SN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chat-box {
+            max-height: 500px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        .chat-message {
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 70%;
+        }
+        .chat-message.sent {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            text-align: right;
+        }
+        .chat-message.received {
+            background-color: #ffffff;
+            text-align: left;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
 <nav th:replace="fragments/navbar.html :: navbar"> </nav>
 
 <div class="container my-5">
-    <!-- Chatroom Toolbar -->
-    <div class="d-flex justify-content-between mb-4">
-        <div>
-            <a href="/chatrooms" class="btn btn-secondary me-2">Back to My Chats</a>
-            <a th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}" class="btn btn-primary">Manage Chatroom</a>
+    <div class="d-flex justify-content-between mb-3">
+        <a href="/chatrooms" class="btn btn-secondary">Back</a>
+        <a th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}" class="btn btn-primary">Manage</a>
+    </div>
+
+    <div class="chat-box mb-4" id="chatBox">
+        <div th:each="msg : ${messages}">
+            <div th:class="'chat-message ' + (${msg.senderName} == ${currentUser} ? 'sent' : 'received')">
+                <div><strong th:text="${msg.senderName}">Sender</strong></div>
+                <div th:text="${msg.content}">Message content</div>
+                <small class="text-muted" th:text="${#dates.format(msg.timestamp, 'HH:mm')}">Time</small>
+            </div>
         </div>
     </div>
-</div>
 
-<h2 class="mb-4">Here is our messages. soon it will be here</h2>
-<!-- <div th:replace="~{fragments/chatroom-messages :: chatroomMessages(${messages})}"></div> -->
+    <form th:action="@{/chatrooms/{id}/send(id=${chatroomId})}" method="post" class="d-flex">
+        <input type="text" name="message" class="form-control me-2" placeholder="Type your message..." required>
+        <button type="submit" class="btn btn-success">Send</button>
+    </form>
+</div>
 
 <footer th:replace="fragments/footer.html :: footer"> </footer>
 
+<script>
+    // Scroll to bottom
+    const chatBox = document.getElementById("chatBox");
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

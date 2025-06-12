@@ -116,6 +116,18 @@ public class ChatroomController {
         return "discover";
     }
 
+    @GetMapping("/search-community")
+    public String searchCommunity(@RequestParam String query, Model model) {
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow();
+
+        List<Chatroom> foundCommunities = chatroomService.searchCommunities(query, user.getId());
+        model.addAttribute("foundCommunities", foundCommunities);
+        model.addAttribute("query", query);
+
+        return "discover";
+    }
+
     //---------------------------------------------------------
     @GetMapping("")
     public String myChatrooms(Model model) {
@@ -205,6 +217,11 @@ public class ChatroomController {
         Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
         model.addAttribute("chatroomId", chatroomId);
         model.addAttribute("chatroomType", chatroom.getType().toString());
+
+
+        // create an emty list od dtrings called messages
+        List<String> messages = List.of();
+        model.addAttribute("messages", messages);
 
         return "view-chatroom";
     }

@@ -46,4 +46,9 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                                             @Param("memberCount") long memberCount,
                                             @Param("type") ChatroomType type);
 
+    // create a query that retrieves all communities that match the search query, and that the userId is not in them
+    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY' " +
+            "AND LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "AND :userId NOT IN (SELECT m.id FROM c.members m)")
+    List<Chatroom> searchCommunities(String query, Long userId);
 }
