@@ -10,7 +10,13 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="mb-2 mb-md-0">
                     <strong th:text="${chat.name}"></strong>
-                    <span class="badge bg-secondary ms-2" th:text="${chat.type}"></span>
+                    <span class="ms-2" th:switch="${chat.type.name()}">
+                        <span th:case="'COMMUNITY'" class="badge bg-info text-dark">Community</span>
+                        <span th:case="'PRIVATE'" class="badge bg-primary">Private</span>
+                        <span th:case="'GROUP'" class="badge bg-success">Group</span>
+                        <span th:case="*"
+                              class="badge bg-secondary">Unknown</span>
+                    </span>
                 </div>
 
                 <div class="btn-group">

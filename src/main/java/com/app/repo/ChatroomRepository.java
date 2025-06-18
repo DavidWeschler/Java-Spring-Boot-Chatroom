@@ -20,8 +20,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
     List<Chatroom> findByMembers_Id(Long userId);
 
-//    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY' AND :userId NOT IN (SELECT u.id FROM c.members u)")   // uncomment this after debug
-    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY'")     // for debug - show all communities
+    @Query("SELECT c FROM Chatroom c WHERE c.type = 'COMMUNITY' AND :userId NOT IN (SELECT u.id FROM c.members u)")// for debug - show all communities
     List<Chatroom> findCommunitiesNotJoinedByUser(@Param("userId") Long userId);
 
     @Query("SELECT u.id AS id, u.username AS username, u.email AS email " +
@@ -51,5 +50,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             "AND LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "AND :userId NOT IN (SELECT m.id FROM c.members m)")
     List<Chatroom> searchCommunities(String query, Long userId);
+
 }
 
