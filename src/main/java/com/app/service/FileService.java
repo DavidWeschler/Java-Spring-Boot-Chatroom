@@ -22,10 +22,12 @@ public class FileService {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return null;
         }
+        String mimeType = multipartFile.getContentType(); // e.g. image/png
         File file = new File();
         file.setFilename(multipartFile.getOriginalFilename());
         file.setFileData(multipartFile.getBytes());
         file.setUploadedAt(LocalDateTime.now());
+        file.setMimeType(mimeType);
         return fileRepository.save(file);
     }
 

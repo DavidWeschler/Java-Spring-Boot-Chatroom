@@ -125,19 +125,17 @@
             <div>
                 <div class="chat-bubble">
                     <div th:if="${msg.file != null}">
-                        <div th:if="${#strings.endsWith(msg.file.filename, '.jpg') or
-                 #strings.endsWith(msg.file.filename, '.jpeg') or
-                 #strings.endsWith(msg.file.filename, '.png') or
-                 #strings.endsWith(msg.file.filename, '.gif')}">
-                            <img class="image-preview"
-                                 th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
-                                 style="max-width: 100px; max-height: 100px; margin-left: 10px;" />
+                        <div th:if="${msg.file.mimeType != null}">
+                            <div th:if="${#strings.startsWith(msg.file.mimeType, 'image/')}">
+                                <img class="image-preview"
+                                     th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
+                                     style="max-width: 100px; max-height: 100px; margin-left: 10px;" />
+                            </div>
                         </div>
 
                         <a th:href="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
                            th:text="${msg.file.filename}" download></a>
                     </div>
-
 
                     <span class="sender-name" th:if="${msg.senderName != currentUser}" th:text="${msg.senderName}">Sender</span>
                     <div th:text="${msg.content}">Message content</div>

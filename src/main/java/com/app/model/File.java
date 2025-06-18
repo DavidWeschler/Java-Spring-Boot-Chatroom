@@ -12,6 +12,7 @@ public class File {
     private Long id;
 
     private String filename;
+    private String mimeType;
 
     @Lob
     @Column(nullable = false, columnDefinition = "LONGBLOB")
@@ -40,5 +41,13 @@ public class File {
 
     public LocalDateTime getUploadedAt() { return uploadedAt; }
     public void setUploadedAt(LocalDateTime uploadedAt) { this.uploadedAt = uploadedAt; }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
 }
 
