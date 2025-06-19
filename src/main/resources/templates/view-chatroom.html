@@ -118,6 +118,11 @@
         </div>
     </div>
 
+    <div class="chat-toolbar-users px-3 py-2 text-muted small">
+        Online users: <span id="onlineUsers">Loading...</span>
+    </div>
+
+
     <div class="chat-messages" id="chatBox">
         <div th:each="msg : ${messages}"
              th:class="'chat-message-row' + (${msg.senderName == currentUser} ? ' me' : '')">
@@ -199,11 +204,54 @@
         const socket = new SockJS('/chat');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function () {
+            // Subscribe to messages
             stompClient.subscribe('/topic/messages', function (messageOutput) {
                 const msg = JSON.parse(messageOutput.body);
                 showMessage(msg);
             });
+
+            // Subscribe to presence updates
+            stompClient.subscribe('/topic/presence', function (presenceEvent) {
+                const presence = JSON.parse(presenceEvent.body);
+                showPresenceNotification(presence);
+                fetchOnlineUsers();
+                console.log("Presence update:", presence);
+            });
+
+            // Initial fetch of who is online
+            fetchOnlineUsers();
         });
+    }
+
+    function showPresenceNotification(presence) {
+        const user = presence.username;
+        const type = presence.type;
+
+        const alertBox = document.createElement("div");
+        alertBox.className = "alert alert-info text-center py-2";
+        alertBox.textContent = `${user} has ${type === 'JOIN' ? 'joined' : 'left'} the chat`;
+
+        const chatBox = document.getElementById("chatBox");
+        chatBox.appendChild(alertBox);
+
+        setTimeout(() => alertBox.remove(), 8000);
+    }
+
+    // check if this can be moved to the backend (probably not)
+    function fetchOnlineUsers() {
+        fetch('/presence/online')
+            .then(response => response.json())
+            .then(users => {
+                const container = document.getElementById('onlineUsers');
+                if (users.length === 0) {
+                    container.textContent = "No one online";
+                } else {
+                    container.textContent = users.join(", ");
+                }
+            })
+            .catch(err => {
+                console.error("Failed to load online users", err);
+            });
     }
 
     function showMessage(msg) {
@@ -268,8 +316,6 @@
             document.getElementById('uploadSpinner').classList.add('d-none');
         }
     }
-
-
 
     async function sendMessageWithFile(messageText, file) {
         const currentUserId = document.getElementById('app-data').dataset.currentUserId;

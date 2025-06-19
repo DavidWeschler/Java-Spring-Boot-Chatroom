@@ -65,5 +65,11 @@ public class UserService {
     public Optional<User> findByGoogleId(String googleId) {
         return userRepository.findByGoogleId(googleId);
     }
+
+    public String getDisplayNameByGoogleId(String googleId) {
+        return findByGoogleId(googleId)
+                .map(User::getUsername) // or getDisplayName if you rename the field
+                .orElse("Unknown User");
+    }
 }
 
