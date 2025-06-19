@@ -8,6 +8,7 @@ import com.app.service.ChatroomService;
 import com.app.service.FileService;
 import com.app.service.CurrentUserService;
 import com.app.service.MessageService;
+import com.app.session.UserSessionBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,35 +48,8 @@ public class ChatroomController {
     @Autowired
     private FileService fileService;
 
-//    @PostMapping("/{chatroomId}/send-message")
-//    public String sendMessage(@PathVariable Long chatroomId,
-//                              @RequestParam("message") String content,
-//                              @RequestParam(value = "file", required = false) MultipartFile file,
-//                              RedirectAttributes redirectAttributes) {
-//        if (content.length() > 255) {
-//            redirectAttributes.addFlashAttribute("error", "Message must be 255 characters or less.");
-//            return "redirect:/chatrooms/" + chatroomId + "/view-chatroom";
-//        }
-//
-//        // Ensure user is a member and chatroom exists
-//        User user = chatroomService.requireMembershipOrThrow(chatroomId);
-//        Chatroom chatroom = chatroomService.findById(chatroomId)
-//                .orElseThrow(() -> new IllegalArgumentException("Chatroom not found"));
-//
-//        // Handle file upload
-//        File attachedFile = null;
-//        try {
-//            attachedFile = fileService.saveFile(file); // returns null if file is empty
-//        } catch (IOException e) {
-//            redirectAttributes.addFlashAttribute("error", "File upload failed: " + e.getMessage());
-//            return "redirect:/chatrooms/" + chatroomId + "/view-chatroom";
-//        }
-//
-//        // Pass file to messageService
-//        messageService.sendMessageToChatroom(content, chatroom, user, attachedFile);
-//
-//        return "redirect:/chatrooms/" + chatroomId + "/view-chatroom";
-//    }
+    @Autowired
+    private UserSessionBean userSession;
 
     @PostMapping("/{chatroomId}/upload")
     @ResponseBody
@@ -318,7 +292,7 @@ public class ChatroomController {
 
     @GetMapping("/{chatroomId}/view-chatroom")
     public String viewChatroom(@PathVariable Long chatroomId, Model model) {
-
+        userSession.visitChatroom(chatroomId);
         Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow();
 
         List<Message> messages = messageRepository.findByChatroomOrderByTimestampAsc(chatroom);
