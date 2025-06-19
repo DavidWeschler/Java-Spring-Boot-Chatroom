@@ -225,11 +225,14 @@
         });
     }
 
-
-
     function showPresenceNotification(presence) {
+        const currentUserName = document.getElementById('app-data').dataset.currentUserName;
         const user = presence.username;
         const type = presence.type;
+
+        if (user === /*[[${currentUserName}]]*/ "defaultUser") {
+            return;
+        }
 
         const alertBox = document.createElement("div");
         alertBox.className = "alert alert-info text-center py-2";
