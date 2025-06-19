@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.model.*;
 import com.app.projection.UserProjection;
 import com.app.repo.MessageRepository;
+import com.app.repo.ReportRepository;
 import com.app.repo.UserRepository;
 import com.app.service.ChatroomService;
 import com.app.service.FileService;
@@ -25,6 +26,8 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/chatrooms")
@@ -50,6 +53,9 @@ public class ChatroomController {
 
     @Autowired
     private UserSessionBean userSession;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @PostMapping("/{chatroomId}/upload")
     @ResponseBody
@@ -306,6 +312,14 @@ public class ChatroomController {
         // I think this is not needed, but leaving it here for now; we can access userId in the backend
         model.addAttribute("currentUserId", user.getId());
         model.addAttribute("currentUserName", user.getUsername());
+
+        List<Report> myReports = reportRepository.findAllByReporter(user); // not all users
+        Set<Long> reportedByMe = myReports.stream()
+                .map(r -> r.getReportedMessage().getId())
+                .collect(Collectors.toSet());
+
+        model.addAttribute("reportedByMeIds", reportedByMe); // rename for clarity
+
 
         return "view-chatroom";
     }

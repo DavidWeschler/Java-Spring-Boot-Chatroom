@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -53,8 +54,14 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-
     @ManyToMany(mappedBy = "members")
     private Set<Chatroom> chatrooms = new HashSet<>();
+
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL)
+    private List<Report> reportsMade;
+
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL)
+    private List<Report> reportsReceived;
+
 
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -33,6 +34,9 @@ public class Message {
     @OneToOne
     @JoinColumn(name = "file_id")
     private File file;
+
+    @OneToMany(mappedBy = "reportedMessage", cascade = CascadeType.ALL)
+    private List<Report> reports;
 
     public String getSenderName() {
         return sender != null ? sender.getUsername() : "Unknown";
