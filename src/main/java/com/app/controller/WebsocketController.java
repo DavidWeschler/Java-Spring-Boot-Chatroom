@@ -9,17 +9,24 @@ import com.app.service.ChatroomService;
 import com.app.service.CurrentUserService;
 import com.app.service.FileService;
 import com.app.service.MessageService;
+import com.app.listeners.WebSocketEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.security.Principal;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Controller
 public class WebsocketController {
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private MessageService messageService;
@@ -36,21 +43,18 @@ public class WebsocketController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private WebSocketEventListener webSocketEventListener;  // Add this to call new method
+
     @MessageMapping("/chat")
-    @SendTo("/topic/messages")
-    public ChatMessageDTO send(ChatMessageDTO message) {
-        System.out.println("Received message: " + message.toString());
+    public void send(ChatMessageDTO message) {
+        System.out.println("Received message: " + message);
 
         Chatroom chatroom = chatroomService.findById(message.getChatroomId())
                 .orElseThrow(() -> new IllegalArgumentException("Chatroom not found"));
 
         User sender = userRepository.findById(message.getFromId())
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
-
-//        // Optional: Validate the sender is a member of the chatroom
-//        if (!chatroomService.isMember(chatroom.getId(), sender)) {
-//            throw new AccessDeniedException("Sender is not a member of the chatroom");
-//        }
 
         File file = null;
         if (message.getFileId() != null) {
@@ -69,6 +73,21 @@ public class WebsocketController {
             message.setFilename(file.getFilename());
         }
 
-        return message;
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + chatroom.getId(), message
+        );
+    }
+
+    // New handler for join message to register user to chatroom
+    @MessageMapping("/join")
+    public void handleJoin(Map<String, Long> payload, StompHeaderAccessor accessor) {
+        Long chatroomId = payload.get("chatroomId");
+        Principal user = accessor.getUser();
+        String sessionId = accessor.getSessionId();
+
+        if (user != null && chatroomId != null) {
+            webSocketEventListener.addUserToChatroom(user.getName(), chatroomId, sessionId);
+            System.out.println("[WebSocket] User " + user.getName() + " joined chatroom (via join message) " + chatroomId);
+        }
     }
 }

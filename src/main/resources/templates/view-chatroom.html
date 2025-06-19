@@ -203,25 +203,29 @@
     function connect() {
         const socket = new SockJS('/chat');
         stompClient = Stomp.over(socket);
+
         stompClient.connect({}, function () {
-            // Subscribe to messages
-            stompClient.subscribe('/topic/messages', function (messageOutput) {
+            // Subscribe to chat messages and presence for the chatroom
+            stompClient.subscribe(`/topic/messages/${chatroomId}`, function (messageOutput) {
                 const msg = JSON.parse(messageOutput.body);
                 showMessage(msg);
             });
 
-            // Subscribe to presence updates
-            stompClient.subscribe('/topic/presence', function (presenceEvent) {
+            stompClient.subscribe(`/topic/presence/${chatroomId}`, function (presenceEvent) {
                 const presence = JSON.parse(presenceEvent.body);
                 showPresenceNotification(presence);
                 fetchOnlineUsers();
                 console.log("Presence update:", presence);
             });
 
-            // Initial fetch of who is online
+            // Send a custom "join" message to inform the server about the chatroom
+            stompClient.send("/app/join", {}, JSON.stringify({ chatroomId: chatroomId }));
+
             fetchOnlineUsers();
         });
     }
+
+
 
     function showPresenceNotification(presence) {
         const user = presence.username;
@@ -239,7 +243,7 @@
 
     // check if this can be moved to the backend (probably not)
     function fetchOnlineUsers() {
-        fetch('/presence/online')
+        fetch('/presence/online/chatroom/' + chatroomId)
             .then(response => response.json())
             .then(users => {
                 const container = document.getElementById('onlineUsers');

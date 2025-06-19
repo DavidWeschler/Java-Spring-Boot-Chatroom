@@ -12,13 +12,16 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class WebSocketEventListener {
 
-    private static final Set<String> connectedUsers = ConcurrentHashMap.newKeySet();
+    private final Map<Long, Set<String>> chatroomUsers = new ConcurrentHashMap<>();
+    private final Map<String, Long> sessionChatroomMap = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -26,45 +29,78 @@ public class WebSocketEventListener {
     @Autowired
     private UserService userService;
 
+    private Long extractChatroomId(StompHeaderAccessor accessor) {
+        String idHeader = accessor.getFirstNativeHeader("chatroomId");
+        return (idHeader != null) ? Long.parseLong(idHeader) : null;
+    }
+
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        Principal userPrincipal = accessor.getUser();
-        if (userPrincipal != null) {
-            String googleId = userPrincipal.getName();
-            connectedUsers.add(googleId);
+        Principal user = accessor.getUser();
+        Long chatroomId = extractChatroomId(accessor);
 
-            // Lookup display name
-            String displayName = userService.getDisplayNameByGoogleId(googleId);
+        System.out.println("new user connected: " + (user != null ? user.getName() : "anonymous") +
+                           " to chatroom: " + chatroomId);
 
-            // Broadcast JOIN event
-            PresenceMessage presence = new PresenceMessage(displayName, "JOIN");
-            messagingTemplate.convertAndSend("/topic/presence", presence);
+        if (user != null && chatroomId != null) {
+            String userId = user.getName();
+            String sessionId = accessor.getSessionId();
 
-            System.out.println("[WebSocket] User connected: " + displayName);
+            chatroomUsers.computeIfAbsent(chatroomId, k -> ConcurrentHashMap.newKeySet()).add(userId);
+            sessionChatroomMap.put(sessionId, chatroomId); // Map session to chatroom for disconnect handling
+
+            String username = userService.getDisplayNameByGoogleId(userId);
+
+            messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
+                    new PresenceMessage(username, "JOIN"));
+
+            System.out.println("[WebSocket] " + username + " joined chatroom " + chatroomId);
         }
     }
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        Principal userPrincipal = accessor.getUser();
-        if (userPrincipal != null) {
-            String googleId = userPrincipal.getName();
-            connectedUsers.remove(googleId);
+        Principal user = accessor.getUser();
+        String sessionId = accessor.getSessionId();
+        Long chatroomId = sessionChatroomMap.remove(sessionId);
 
-            // Lookup display name
-            String displayName = userService.getDisplayNameByGoogleId(googleId);
+        System.out.println("user disconnected: " + (user != null ? user.getName() : "anonymous") +
+                           " from chatroom: " + chatroomId);
 
-            // Broadcast LEAVE event
-            PresenceMessage presence = new PresenceMessage(displayName, "LEAVE");
-            messagingTemplate.convertAndSend("/topic/presence", presence);
+        if (user != null && chatroomId != null) {
+            String userId = user.getName();
+            Set<String> users = chatroomUsers.get(chatroomId);
 
-            System.out.println("[WebSocket] User disconnected: " + displayName);
+            if (users != null) {
+                users.remove(userId);
+                if (users.isEmpty()) {
+                    chatroomUsers.remove(chatroomId);
+                }
+            }
+
+            String username = userService.getDisplayNameByGoogleId(userId);
+
+            messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
+                    new PresenceMessage(username, "LEAVE"));
+
+            System.out.println("[WebSocket] " + username + " left chatroom " + chatroomId);
         }
     }
 
-    public Set<String> getConnectedUsers() {
-        return connectedUsers;
+    public Set<String> getConnectedUsers(Long chatroomId) {
+        System.out.println("[WebSocket] Fetching connected users for chatroom " + chatroomId);
+        return chatroomUsers.getOrDefault(chatroomId, Collections.emptySet());
     }
+
+    public void addUserToChatroom(String userId, Long chatroomId, String sessionId) {
+        chatroomUsers.computeIfAbsent(chatroomId, k -> ConcurrentHashMap.newKeySet()).add(userId);
+        sessionChatroomMap.put(sessionId, chatroomId);
+
+        String username = userService.getDisplayNameByGoogleId(userId);
+        messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
+                new PresenceMessage(username, "JOIN"));
+    }
+
 }
