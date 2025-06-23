@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,7 +21,7 @@ public class MessageService {
         return messageRepository.findByChatroomOrderByTimestampAsc(chatroom);
     }
 
-    public void sendMessageToChatroom(String content, Chatroom chatroom, User sender, File file) {
+    public Message sendMessageToChatroom(String content, Chatroom chatroom, User sender, File file) {
         Message message = new Message();
         message.setContent(content);
         message.setChatroom(chatroom);
@@ -30,6 +29,7 @@ public class MessageService {
         message.setTimestamp(LocalDateTime.now());
         message.setFile(file);
         messageRepository.save(message);
+        return message;
     }
 }
 

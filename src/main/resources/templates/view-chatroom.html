@@ -5,41 +5,47 @@
     <title>Chatroom - WhatsApp SN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
     <style>
         body {
-            background: #f8f9fa;
-        }
-        .chat-toolbar {
-            border-bottom: 1px solid #ececec;
-            background: #fff;
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .chat-toolbar-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #212121;
+            background: #121212;
+            color: #f1f8e9;
         }
         .chatbox-main {
             max-width: 720px;
             margin: 2rem auto;
-            box-shadow: 0 2px 12px rgba(80, 80, 80, 0.08);
-            border-radius: 18px;
-            background: #fff;
+            background: #1e1e1e;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             height: 80vh;
         }
+        .chat-toolbar {
+            padding: 1rem 1.25rem;
+            background: #2e7d32;
+            color: #f1f8e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-toolbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .chat-toolbar-users {
+            background: #1b5e20;
+            color: #a5d6a7;
+        }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 2rem 1.5rem 1.5rem 1.5rem;
-            background: #f7f8fa;
+            padding: 1.5rem;
+            background: #1a1a1a;
         }
         .chat-message-row {
             display: flex;
@@ -53,54 +59,69 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: #d7f0e4;
             margin: 0 0.75rem;
             object-fit: cover;
         }
         .chat-bubble {
-            max-width: 100%;
-            background: #fff;
-            border-radius: 18px;
+            background: #2c2c2c;
+            color: #f1f8e9;
             padding: 0.85rem 1.15rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            font-size: 1rem;
-            color: #212121;
+            border-radius: 1rem;
+            max-width: 100%;
         }
         .chat-message-row.me .chat-bubble {
-            background: #daf9e8;
+            background: #388e3c;
+            color: #fff;
+        }
+        .sender-name {
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 0.25rem;
+            display: block;
         }
         .chat-meta {
-            margin-top: 0.3rem;
-            font-size: 0.76rem;
+            font-size: 0.75rem;
             color: #999;
+            margin-top: 0.3rem;
             text-align: right;
         }
         .chat-input-area {
-            border-top: 1px solid #ececec;
-            background: #fff;
-            padding: 0.7rem 1.2rem;
+            border-top: 1px solid #333;
+            background: #1e1e1e;
+            padding: 0.75rem 1.25rem;
             display: flex;
+            gap: 0.5rem;
             align-items: center;
-            gap: 0.6rem;
         }
         .chat-input-area input[type="text"] {
             flex: 1;
-            border-radius: 20px;
-            border: 1px solid #e1e3e1;
-            padding: 0.7rem 1.1rem;
-            font-size: 1rem;
-            background: #f8f8fa;
+            padding: 0.6rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #444;
+            background: #121212;
+            color: #f1f8e9;
         }
         .file-label {
-            margin: 0 0.5rem 0 0;
+            margin-right: 0.5rem;
             cursor: pointer;
         }
-        .chat-bubble span.sender-name {
-            font-weight: 500;
-            color: #388e3c;
-            display: block;
-            margin-bottom: 0.3rem;
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 0.5rem;
         }
+        .chat-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #2e7d32;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #f1f8e9;
+        }
+
     </style>
 </head>
 <body>
@@ -108,14 +129,16 @@
 <nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
 
 <div id="app-data"
-     th:attr="data-current-user-id=${currentUserId}, data-current-user-name='${currentUserName}'"></div>
+     th:attr="data-current-user-id=${currentUserId}, data-current-user-name='${currentUserName}', data-chatroom-id=${chatroomId}">
+</div>
+
 
 <div class="chatbox-main">
     <div class="chat-toolbar">
         <span class="chat-toolbar-title" th:text="${chatroomName}">Chatroom Name</span>
-        <div class="chat-toolbar-actions">
-            <a href="/chatrooms" class="btn btn-outline-secondary btn-sm">Back</a>
-            <a th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}" class="btn btn-outline-primary btn-sm">Manage</a>
+        <div>
+            <a href="/chatrooms" class="btn btn-outline-light btn-sm">Back</a>
+            <a th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}" class="btn btn-outline-light btn-sm">Manage</a>
         </div>
     </div>
 
@@ -123,10 +146,9 @@
         Online users: <span id="onlineUsers">Loading...</span>
     </div>
 
-
     <div class="chat-messages" id="chatBox">
         <div th:each="msg : ${messages}"
-             th:class="'chat-message-row' + (${msg.senderName == currentUser} ? ' me' : '')">
+             th:class="'chat-message-row' + (${msg.senderName == currentUserName} ? ' me' : '')">
             <img class="chat-avatar" th:src="@{/img/bear.png}" th:if="${msg.senderName != currentUser}" alt="Avatar" />
             <div>
                 <div class="chat-bubble">
@@ -134,8 +156,7 @@
                         <div th:if="${msg.file.mimeType != null}">
                             <div th:if="${#strings.startsWith(msg.file.mimeType, 'image/')}">
                                 <img class="image-preview"
-                                     th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
-                                     style="max-width: 100px; max-height: 100px; margin-left: 10px;" />
+                                     th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}" />
                             </div>
                         </div>
                         <a th:href="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
@@ -145,12 +166,12 @@
                     <span class="sender-name" th:if="${msg.senderName != currentUser}" th:text="${msg.senderName}">Sender</span>
                     <div th:text="${msg.content}">Message content</div>
                     <div class="chat-meta" th:text="${#temporals.format(msg.timestamp, 'HH:mm')}">1/1/1970</div>
+
                     <i class="bi bi-exclamation-triangle-fill text-danger"
                        th:if="${reportedByMeIds.contains(msg.id)}"
                        title="This message has been reported">
                     </i>
 
-                    <!-- Report button -->
                     <div class="text-end mt-1"
                          th:if="${msg.senderName != currentUserName and !reportedByMeIds.contains(msg.id)}">
                         <a th:href="@{'/reports/message/' + ${msg.id}}"
@@ -165,10 +186,10 @@
 
     <form class="chat-input-area" enctype="multipart/form-data" method="post">
         <label class="file-label" title="Attach file">
-            <svg width="23" height="23" fill="#3d8b60" viewBox="0 0 24 24">
+            <svg width="23" height="23" fill="#a5d6a7" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" />
             </svg>
-            <input type="file" name="file" />
+            <input type="file" name="file" class="d-none" />
         </label>
         <input type="text" name="message" placeholder="Type a message..." required maxlength="255" />
         <button type="submit" class="btn btn-success px-3">Send</button>
@@ -178,7 +199,6 @@
         <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
         Uploading file...
     </div>
-
 </div>
 
 <footer th:replace="~{fragments/footer.html :: footer}"></footer>
@@ -204,6 +224,7 @@
 </script>
 
 <script th:inline="javascript">
+    const reportedByMeIds = /*[[${reportedByMeIds}]]*/ [];
     let fileUploading = false;
 
     function disableSendButton(disabled) {
@@ -275,37 +296,41 @@
     }
 
     function showMessage(msg) {
-        const currentUserName = document.getElementById('app-data').dataset.currentUserName;
-        const isMe = msg.from === currentUserName;
+        const currentUserId = document.getElementById('app-data').dataset.currentUserId;
+        const isMe = String(msg.fromId) === String(currentUserId);
         const chatBox = document.getElementById("chatBox");
 
         const messageRow = document.createElement("div");
         messageRow.className = "chat-message-row" + (isMe ? " me" : "");
 
-        const avatar = isMe ? "" : `<img class="chat-avatar" src="/img/bear.png" alt="Avatar" />`;
-
         const fileLink = msg.fileId && msg.filename
             ? msg.filename.endsWith('.jpg') || msg.filename.endsWith('.png') || msg.filename.endsWith('.jpeg') || msg.filename.endsWith('.gif')
                 ? `<img class="image-preview" src="/chatrooms/files/${msg.fileId}/download"
-                        style="max-width: 100px; max-height: 100px; margin-left: 10px;" />`
+                    style="max-width: 100px; max-height: 100px; margin-top: 0.5rem;" />`
                 : `<a href="/chatrooms/files/${msg.fileId}/download" download>${msg.filename}</a>`
             : "";
 
         messageRow.innerHTML = `
-            ${avatar}
-            <div>
-                <div class="chat-bubble">
-                    ${!isMe ? `<span class="sender-name">${msg.from}</span>` : ""}
-                    ${fileLink}
-                    <div>${msg.text}</div>
-                    <div class="chat-meta">${msg.time}</div>
-                </div>
+        <img class="chat-avatar" src="/img/bear.png" alt="Avatar" />
+        <div>
+            <div class="chat-bubble">
+                ${!isMe ? `<span class="sender-name">${msg.from}</span>` : ""}
+                ${fileLink}
+                <div>${msg.text}</div>
+                <div class="chat-meta">${msg.time}</div>
+                ${!isMe && !reportedByMeIds.includes(msg.id) ? `
+                    <div class="text-end mt-1">
+                        <a href="/reports/message/${msg.id}" class="btn btn-sm btn-outline-danger">Report</a>
+                    </div>
+                ` : ""}
             </div>
-        `;
+        </div>
+    `;
 
         chatBox.appendChild(messageRow);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
+
 
     async function uploadFile(file) {
         fileUploading = true;

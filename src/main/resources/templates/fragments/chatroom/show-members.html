@@ -1,8 +1,11 @@
 <div th:fragment="chatroomMembers">
     <h2 class="mb-4">Chatroom Members (<span th:text="${#lists.size(members)}"></span>)</h2>
     <ul class="list-group">
-        <li th:each="member : ${members}" class="list-group-item">
-            <strong th:text="${member.username}"></strong> (<span th:text="${member.email}"></span>)
+        <li th:each="member : ${members}" class="list-group-item bg-dark text-light border-secondary rounded mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong th:text="${member.username}"></strong>
+                <span class="text-muted small" th:text="${member.email}"></span>
+            </div>
         </li>
     </ul>
 </div>

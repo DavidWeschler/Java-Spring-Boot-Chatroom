@@ -1,26 +1,25 @@
 <div th:fragment="chats(titleText)" class="container my-5">
     <h2 class="mb-4" th:text="${titleText}">My Chats</h2>
 
-    <div th:if="${#lists.isEmpty(chatrooms)}">
+    <div th:if="${#lists.isEmpty(chatrooms)}" class="text-muted">
         <p>You have no active chats yet.</p>
     </div>
 
     <div class="list-group" th:if="${!#lists.isEmpty(chatrooms)}">
-        <div th:each="chat : ${chatrooms}" class="list-group-item">
+        <div th:each="chat : ${chatrooms}" class="list-group-item bg-dark text-light border-secondary rounded mb-2">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div class="mb-2 mb-md-0">
+                <div>
                     <strong th:text="${chat.name}"></strong>
-                    <span class="ms-2" th:switch="${chat.type.name()}">
-                        <span th:case="'COMMUNITY'" class="badge bg-info text-dark">Community</span>
-                        <span th:case="'PRIVATE'" class="badge bg-primary">Private</span>
-                        <span th:case="'GROUP'" class="badge bg-success">Group</span>
-                        <span th:case="*"
-                              class="badge bg-secondary">Unknown</span>
+                    <span class="ms-2 badge"
+                          th:switch="${chat.type.name()}">
+                        <span th:case="'COMMUNITY'" class="bg-info text-dark">Community</span>
+                        <span th:case="'PRIVATE'" class="bg-warning text-dark">Private</span>
+                        <span th:case="'GROUP'" class="bg-success">Group</span>
+                        <span th:case="*" class="bg-secondary">Unknown</span>
                     </span>
                 </div>
-
-                <div class="btn-group">
-                    <a th:href="@{/chatrooms/{id}/view-chatroom(id=${chat.id})}" class="btn btn-outline-primary btn-sm">
+                <div>
+                    <a th:href="@{/chatrooms/{id}/view-chatroom(id=${chat.id})}" class="btn btn-outline-light btn-sm">
                         Chat
                     </a>
                 </div>

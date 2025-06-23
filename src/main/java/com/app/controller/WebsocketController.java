@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.dto.ChatMessageDTO;
 import com.app.model.Chatroom;
 import com.app.model.File;
+import com.app.model.Message;
 import com.app.model.User;
 import com.app.repo.UserRepository;
 import com.app.service.ChatroomService;
@@ -64,10 +65,12 @@ public class WebsocketController {
             }
         }
 
-        messageService.sendMessageToChatroom(message.getText(), chatroom, sender, file);
+        Message savedMessage = messageService.sendMessageToChatroom(message.getText(), chatroom, sender, file);
+        message.setId(savedMessage.getId());
 
         message.setFrom(sender.getUsername());
         message.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
+        message.setFromId(sender.getId());
 
         if (file != null) {
             message.setFilename(file.getFilename());

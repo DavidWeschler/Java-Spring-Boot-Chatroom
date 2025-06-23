@@ -6,9 +6,10 @@ import lombok.Data;
 public class ChatMessageDTO {
     private String from;
     private String text;
-    private String time;         // still used for frontend display
-    private Long chatroomId;     // required for saving to DB
+    private String time;
+    private Long chatroomId;
     private Long fromId;
+    private Long id;
 
     // Optional file metadata (sent only if a file is attached)
     private Long fileId;

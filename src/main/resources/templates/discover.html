@@ -4,74 +4,75 @@
     <meta charset="UTF-8">
     <title>Discover Communities - WhatsApp SN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="bg-light">
+<body class="bg-dark text-light">
 
-<nav th:replace="fragments/navbar.html :: navbar"> </nav>
+<nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
 
 <div class="container my-5">
-    <h2 class="mb-4">Discover Communities</h2>
+    <h2 class="mb-4 text-light">Discover Communities</h2>
 
-    <!-- Search Title -->
-    <h4 class="mt-4">Find a community</h4>
-
-    <!-- Search Form -->
-    <form class="mb-4" th:action="@{/chatrooms/search-community}" method="get">
-        <div class="input-group">
-            <label>
+    <!-- Search Section -->
+    <div class="mb-5 p-4 bg-secondary-subtle rounded shadow-sm">
+        <h5 class="text-dark">Find a Community</h5>
+        <form th:action="@{/chatrooms/search-community}" method="get" class="mt-3">
+            <div class="input-group">
                 <input type="text" name="query" class="form-control" placeholder="Search communities..."
                        th:value="${query}">
-            </label>
-            <button type="submit" class="btn btn-primary">Search</button>
-        </div>
-    </form>
-
-    <!-- Results Table -->
-    <div th:if="${!#lists.isEmpty(foundCommunities)}">
-        <h4>Found Communities:</h4>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Number of Members</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="community : ${foundCommunities}">
-                <td th:text="${community.name}"></td>
-                <td th:text="${community.numOfMembers}"></td>
-                <td>
-                    <form th:action="@{/chatrooms/join/{id}(id=${community.id})}" method="post">
-                        <button type="submit" class="btn btn-success btn-sm">Join</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                <button type="submit" class="btn btn-outline-success">Search</button>
+            </div>
+        </form>
     </div>
 
+    <!-- Search Results Table -->
+    <div th:if="${!#lists.isEmpty(foundCommunities)}" class="mb-5">
+        <h5 class="mb-3">Found Communities:</h5>
+        <div class="table-responsive bg-light rounded shadow-sm">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Members</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="community : ${foundCommunities}">
+                    <td th:text="${community.name}"></td>
+                    <td th:text="${community.numOfMembers}"></td>
+                    <td>
+                        <form th:action="@{/chatrooms/join/{id}(id=${community.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-success">Join</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <div th:if="${#lists.isEmpty(communities)}">
+    <!-- No Communities Found -->
+    <div th:if="${#lists.isEmpty(communities)}" class="text-muted">
         <p>No public communities available.</p>
     </div>
 
-    <div class="list-group" th:if="${!#lists.isEmpty(communities)}">
-        <h4 class="mt-4">Communities that might interest you</h4>
-        <div th:each="community : ${communities}" class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
+    <!-- Suggested Communities List -->
+    <div th:if="${!#lists.isEmpty(communities)}" class="mt-5">
+        <h5 class="mb-3">✨ Communities that Might Interest You</h5>
+        <div class="list-group">
+            <div th:each="community : ${communities}" class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
                 <strong th:text="${community.name}"></strong>
+                <form th:action="@{/chatrooms/join/{id}(id=${community.id})}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-success">Join</button>
+                </form>
             </div>
-
-            <form th:action="@{/chatrooms/join/{id}(id=${community.id})}" method="post" class="m-0">
-                <button type="submit" class="btn btn-success btn-sm">Join</button>
-            </form>
         </div>
     </div>
 </div>
 
-<footer th:replace="fragments/footer.html :: footer"> </footer>
+<footer th:replace="~{fragments/footer.html :: footer}"></footer>
+<div th:insert="~{fragments/scripts.html :: bootstrapScript}"></div>
 
-<div th:insert="fragments/scripts.html :: bootstrapScript"></div>
 </body>
 </html>
