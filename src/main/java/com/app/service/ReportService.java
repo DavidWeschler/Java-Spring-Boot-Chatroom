@@ -1,9 +1,6 @@
 package com.app.service;
 
-import com.app.model.Report;
-import com.app.model.User;
-import com.app.model.Message;
-import com.app.model.Chatroom;
+import com.app.model.*;
 import com.app.repo.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +31,7 @@ public class ReportService {
                 .reportedUser(message.getSender())
                 .reason(reason)
                 .timestamp(LocalDateTime.now())
+                .status(ReportStatus.PENDING)
                 .build();
 
         return Optional.of(reportRepository.save(report));

@@ -1,9 +1,11 @@
 package com.app.repo;
 
 import com.app.model.Report;
+import com.app.model.ReportStatus;
 import com.app.model.User;
 import com.app.model.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +13,11 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     boolean existsByReporterAndReportedMessage(User reporter, Message reportedMessage);
+
+    @Query("SELECT DISTINCT r.reportedMessage FROM Report r WHERE r.status <> 'DISMISSED'")
+    List<Message> findDistinctReportedMessagesWithActiveReports();
+
+    List<Report> findByReportedMessageAndStatusNot(Message message, ReportStatus status);
 
     //this funciton checks if a report exists for a specific reporter and reported message
     Optional<Report> findByReporterAndReportedMessage(User reporter, Message reportedMessage);

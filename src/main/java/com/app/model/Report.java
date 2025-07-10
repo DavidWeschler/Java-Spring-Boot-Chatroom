@@ -38,4 +38,9 @@ public class Report {
 
     @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status = ReportStatus.PENDING;
+
 }

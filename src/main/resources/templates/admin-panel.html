@@ -35,7 +35,12 @@
                         </li>
                     </ul>
 
-                    <!-- Ban form starts here -->
+                    <!-- Single dismiss button for all reports on the message -->
+                    <form th:action="@{/admin/dismiss-message-reports/{id}(id=${msg.id})}" method="post" class="mb-3">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Dismiss All Reports</button>
+                    </form>
+
+                    <!-- Ban form -->
                     <form th:action="@{/admin/ban-user/{userId}(userId=${msg.sender.id})}" method="post" class="d-flex gap-2">
                         <select name="duration" class="form-select form-select-sm w-auto">
                             <option value="24h">Ban 24h</option>
