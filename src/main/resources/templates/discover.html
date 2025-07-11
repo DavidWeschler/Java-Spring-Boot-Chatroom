@@ -59,7 +59,7 @@
 
     <!-- Suggested Communities List -->
     <div th:if="${!#lists.isEmpty(communities)}" class="mt-5">
-        <h5 class="mb-3">✨ Communities that Might Interest You</h5>
+        <h5 class="mb-3">Communities that Might Interest You</h5>
         <div class="list-group">
             <div th:each="community : ${communities}" class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
                 <strong th:text="${community.name}"></strong>
