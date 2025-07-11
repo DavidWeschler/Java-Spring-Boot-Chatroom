@@ -14,7 +14,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     boolean existsByReporterAndReportedMessage(User reporter, Message reportedMessage);
 
-    @Query("SELECT DISTINCT r.reportedMessage FROM Report r WHERE r.status <> 'DISMISSED'")
+    @Query("SELECT DISTINCT r.reportedMessage FROM Report r WHERE r.status = 'PENDING'")
     List<Message> findDistinctReportedMessagesWithActiveReports();
 
     List<Report> findByReportedMessageAndStatusNot(Message message, ReportStatus status);
@@ -23,4 +23,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findByReporterAndReportedMessage(User reporter, Message reportedMessage);
 
     List<Report> findAllByReporter(User user);
+
+    List<Report> findByReportedMessageAndStatus(Message message, ReportStatus status);
+
+
 }

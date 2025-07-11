@@ -56,11 +56,12 @@ public class AdminController {
         return "redirect:/admin/panel";
     }
 
-    @PostMapping("/ban-user/{userId}")
-    public String banUser(@PathVariable Long userId, @RequestParam String duration) {
-        userService.banUser(userId, duration);
+    @PostMapping("/ban-user/{msgId}")
+    public String banUser(@PathVariable Long msgId, @RequestParam String duration) {
+        userService.banUserByMessageId(msgId, duration);
         return "redirect:/admin/panel";
     }
+
 
     @PostMapping("/dismiss-report/{reportId}")
     public String dismissReport(@PathVariable Long reportId) {

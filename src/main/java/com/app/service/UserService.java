@@ -1,6 +1,11 @@
 package com.app.service;
 
+import com.app.model.Message;
+import com.app.model.Report;
+import com.app.model.ReportStatus;
 import com.app.model.User;
+import com.app.repo.MessageRepository;
+import com.app.repo.ReportRepository;
 import com.app.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +26,12 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     /**
      * Registers a user via traditional signup (e.g., with password).
@@ -72,17 +83,29 @@ public class UserService {
                 .orElse("Unknown User");
     }
 
-    public void banUser(Long userId, String duration) {
-        User user = userRepository.findById(userId).orElseThrow();
+    public void banUserByMessageId(Long messageId, String duration) {
+        Message message = messageRepository.findById(messageId).orElseThrow();
+        User user = message.getSender();
+
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime bannedUntil = switch (duration) {
+        LocalDateTime requestedUntil = switch (duration) {
             case "24h" -> now.plusHours(24);
             case "1w" -> now.plusDays(7);
             default -> now.plusYears(100); // ~forever
         };
 
-        user.setBannedUntil(bannedUntil);
-        userRepository.save(user);
+        // Only apply ban if the new one is longer
+        if (user.getBannedUntil() == null || user.getBannedUntil().isBefore(requestedUntil)) {
+            user.setBannedUntil(requestedUntil);
+            userRepository.save(user);
+        }
+
+        // Mark all PENDING reports for this message as ACTION_TAKEN
+        List<Report> relatedReports = reportRepository.findByReportedMessageAndStatus(message, ReportStatus.PENDING);
+        for (Report report : relatedReports) {
+            report.setStatus(ReportStatus.ACTION_TAKEN);
+        }
+        reportRepository.saveAll(relatedReports);
     }
 
 }
