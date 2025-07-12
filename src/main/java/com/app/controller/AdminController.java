@@ -16,10 +16,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -55,13 +59,13 @@ public class AdminController {
         return "admin-panel";
     }
 
-    @PostMapping("/block-user/{userId}")
-    public String blockUser(@PathVariable Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        user.setRole("BLOCKED");
-        userRepository.save(user);
-        return "redirect:/admin/panel";
-    }
+//    @PostMapping("/block-user/{userId}")
+//    public String blockUser(@PathVariable Long userId) {
+//        User user = userRepository.findById(userId).orElseThrow();
+//        user.setRole("BLOCKED");
+//        userRepository.save(user);
+//        return "redirect:/admin/panel";
+//    }
 
     @PostMapping("/ban-user/{msgId}")
     public String banUser(@PathVariable Long msgId, @RequestParam String duration) {
@@ -70,13 +74,13 @@ public class AdminController {
         return "redirect:/admin/panel";
     }
 
-    @PostMapping("/dismiss-report/{reportId}")
-    public String dismissReport(@PathVariable Long reportId) {
-        Report report = reportRepository.findById(reportId).orElseThrow();
-        report.setStatus(ReportStatus.DISMISSED);
-        reportRepository.save(report);
-        return "redirect:/admin/panel";
-    }
+//    @PostMapping("/dismiss-report/{reportId}")
+//    public String dismissReport(@PathVariable Long reportId) {
+//        Report report = reportRepository.findById(reportId).orElseThrow();
+//        report.setStatus(ReportStatus.DISMISSED);
+//        reportRepository.save(report);
+//        return "redirect:/admin/panel";
+//    }
 
     @PostMapping("/dismiss-message-reports/{messageId}")
     public String dismissAllReportsOnMessage(@PathVariable Long messageId) {
@@ -85,6 +89,7 @@ public class AdminController {
 
         for (Report r : reports) {
             r.setStatus(ReportStatus.DISMISSED);
+            r.setUpdatedAt(LocalDateTime.now());
         }
 
         reportRepository.saveAll(reports);
@@ -102,10 +107,23 @@ public class AdminController {
 
     @GetMapping("/panel/reports")
     @ResponseBody
-    public List<MessageReportDTO> getLatestReports() {
-        List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
-
+    public List<MessageReportDTO> getLatestReports(@RequestParam(required = false) String since) {
         List<MessageReportDTO> dtos = new ArrayList<>();
+        final LocalDateTime sinceTime;
+
+        try {
+            sinceTime = Instant.parse(since).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } catch (Exception e) {
+            System.out.println("Invalid 'since' format: " + since);
+            return dtos; // empty list
+        }
+
+        // ✅ If no report was updated since, return nothing
+        boolean anyChanged = reportRepository.existsByUpdatedAtAfter(sinceTime);
+        if (!anyChanged) return dtos;
+
+        // ✅ Return all currently active (non-dismissed) reported messages
+        List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
 
         for (Message msg : reportedMessages) {
             List<Report> activeReports = reportRepository.findByReportedMessageAndStatusNot(msg, ReportStatus.DISMISSED);
@@ -116,8 +134,7 @@ public class AdminController {
             dto.setSenderUsername(msg.getSender().getUsername());
 
             if (msg.getSender().getBannedUntil() != null) {
-                String formatted = msg.getSender().getBannedUntil().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                dto.setBannedUntil(formatted);
+                dto.setBannedUntil(msg.getSender().getBannedUntil().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             }
 
             if (msg.getFile() != null) {
@@ -135,11 +152,20 @@ public class AdminController {
             }
 
             dto.setReports(reportDTOs);
+
+            LocalDateTime latestUpdate = activeReports.stream()
+                    .map(Report::getUpdatedAt)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(LocalDateTime.now());
+
+            dto.setLastUpdated(latestUpdate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             dtos.add(dto);
         }
 
         return dtos;
     }
+
 
     /**
      * AJAX endpoint to get currently banned users

@@ -104,6 +104,7 @@ public class UserService {
         List<Report> relatedReports = reportRepository.findByReportedMessageAndStatus(message, ReportStatus.PENDING);
         for (Report report : relatedReports) {
             report.setStatus(ReportStatus.ACTION_TAKEN);
+            report.setUpdatedAt(LocalDateTime.now());
         }
         reportRepository.saveAll(relatedReports);
     }

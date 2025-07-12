@@ -11,6 +11,7 @@ public class MessageReportDTO {
     private String senderUsername;
     private String bannedUntil; // Optional: ISO-8601 formatted string
     private List<ReportDTO> reports;
+    private String lastUpdated;
 
     private Long fileId;
     private String fileName;

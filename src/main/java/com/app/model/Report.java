@@ -2,6 +2,7 @@ package com.app.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -42,5 +43,9 @@ public class Report {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReportStatus status = ReportStatus.PENDING;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }
