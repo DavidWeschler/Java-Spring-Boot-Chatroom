@@ -19,7 +19,8 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
             "/home",
             "/logout",
             "/logout-confirm",
-            "/error"
+            "/error",
+            "/chatrooms/files"
     );
 
     public AdminAccessInterceptor(CurrentUserService currentUserService) {

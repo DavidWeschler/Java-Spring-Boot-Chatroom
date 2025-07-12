@@ -26,6 +26,16 @@
                         Message by <span th:text="${msg.sender.username}">Sender</span>
                     </h5>
                     <p class="card-text" th:text="${msg.content}">Message content</p>
+                    <!-- File Preview (if any) -->
+                    <div th:if="${msg.file != null}">
+                        <div th:if="${msg.file.mimeType != null}">
+                            <div th:if="${#strings.startsWith(msg.file.mimeType, 'image/')}">
+                                <img class="image-preview" th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}" />
+                            </div>
+                        </div>
+                        <a th:href="@{/chatrooms/files/{id}/download(id=${msg.file.id})}" th:text="${msg.file.filename}" download></a>
+                    </div>
+
 
                     <h6 class="mt-3">Reports:</h6>
                     <ul class="list-group list-group-flush mb-3">
