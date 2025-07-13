@@ -22,11 +22,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
     @Query("SELECT u.id AS id, u.username AS username, u.email AS email " +
             "FROM User u " +
-            "WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<UserProjection> searchUsersByUsername(@Param("query") String query);
-
-    @Query("SELECT u.id AS id, u.username AS username, u.email AS email " +
-            "FROM User u " +
             "WHERE (LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "   OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND u.role <> 'ADMIN' " +

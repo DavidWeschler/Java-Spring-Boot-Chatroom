@@ -14,9 +14,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findByChatroomOrderByTimestampAsc(Chatroom chatroom);
 
-    @Query("SELECT m FROM Message m WHERE SIZE(m.reports) > 0")
-    List<Message> findReportedMessages();
-
     @Query("""
     SELECT m
     FROM Message m

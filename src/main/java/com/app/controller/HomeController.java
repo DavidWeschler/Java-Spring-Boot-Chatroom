@@ -29,11 +29,6 @@ public class HomeController {
     @Autowired
     private BroadcastService broadcastService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
     @GetMapping("/home")
     public String home(Model model) {
         OAuth2User user = currentUserService.getCurrentUser();
