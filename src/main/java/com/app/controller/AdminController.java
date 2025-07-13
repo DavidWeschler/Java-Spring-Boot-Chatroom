@@ -2,27 +2,18 @@ package com.app.controller;
 
 import com.app.dto.BannedUserDTO;
 import com.app.dto.MessageReportDTO;
-import com.app.dto.ReportDTO;
 import com.app.model.Message;
-import com.app.model.Report;
-import com.app.model.ReportStatus;
 import com.app.model.User;
-import com.app.repo.MessageRepository;
-import com.app.repo.ReportRepository;
 import com.app.repo.UserRepository;
+import com.app.service.AdminService;
 import com.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -30,29 +21,18 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     @Autowired
-    private ReportRepository reportRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private AdminService adminService;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/panel")
     public String adminPanel(Model model) {
-        List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
-
-        for (Message msg : reportedMessages) {
-            List<Report> activeReports = reportRepository.findByReportedMessageAndStatusNot(msg, ReportStatus.DISMISSED);
-            msg.setReports(activeReports);
-        }
-
-        model.addAttribute("reportedMessages", reportedMessages);
-        cleanupExpiredBans();
-
+        model.addAttribute("reportedMessages", adminService.getReportedMessagesWithReportsAttached());
+        adminService.cleanupExpiredBans();
         return "admin-panel";
     }
 
@@ -64,98 +44,23 @@ public class AdminController {
 
     @PostMapping("/dismiss-message-reports/{messageId}")
     public String dismissAllReportsOnMessage(@PathVariable Long messageId) {
-        Message message = messageRepository.findById(messageId).orElseThrow();
-        List<Report> reports = reportRepository.findByReportedMessageAndStatusNot(message, ReportStatus.DISMISSED);
-
-        for (Report r : reports) {
-            r.setStatus(ReportStatus.DISMISSED);
-            r.setUpdatedAt(LocalDateTime.now());
-        }
-
-        reportRepository.saveAll(reports);
+        adminService.dismissReportsForMessage(messageId);
         return "redirect:/admin/panel";
     }
 
     @GetMapping("/panel/reports")
     @ResponseBody
     public List<MessageReportDTO> getLatestReports(@RequestParam(required = false) String since) {
-        List<MessageReportDTO> dtos = new ArrayList<>();
-        final LocalDateTime sinceTime;
-
-        try {
-            sinceTime = Instant.parse(since).atZone(ZoneId.systemDefault()).toLocalDateTime();
-        } catch (Exception e) {
-            return dtos;
-        }
-
-        boolean anyChanged = reportRepository.existsByUpdatedAtAfter(sinceTime);
-        if (!anyChanged) return dtos;
-
-        List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
-
-        for (Message msg : reportedMessages) {
-            List<Report> activeReports = reportRepository.findByReportedMessageAndStatusNot(msg, ReportStatus.DISMISSED);
-
-            MessageReportDTO dto = new MessageReportDTO();
-            dto.setId(msg.getId());
-            dto.setContent(msg.getContent());
-            dto.setSenderUsername(msg.getSender().getUsername());
-
-            if (msg.getSender().getBannedUntil() != null) {
-                dto.setBannedUntil(msg.getSender().getBannedUntil().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            }
-
-            if (msg.getFile() != null) {
-                dto.setFileId(msg.getFile().getId());
-                dto.setFileName(msg.getFile().getFilename());
-                dto.setFileMimeType(msg.getFile().getMimeType());
-            }
-
-            List<ReportDTO> reportDTOs = new ArrayList<>();
-            for (Report report : activeReports) {
-                ReportDTO r = new ReportDTO();
-                r.setReporterUsername(report.getReporter().getUsername());
-                r.setReason(report.getReason());
-                reportDTOs.add(r);
-            }
-
-            dto.setReports(reportDTOs);
-
-            LocalDateTime latestUpdate = activeReports.stream()
-                    .map(Report::getUpdatedAt)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo)
-                    .orElse(LocalDateTime.now());
-
-            dto.setLastUpdated(latestUpdate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            dtos.add(dto);
-        }
-
-        return dtos;
+        return adminService.getLatestReportsSince(since);
     }
 
     @GetMapping("/panel/banned-users")
     @ResponseBody
     public List<BannedUserDTO> getBannedUsers() {
         LocalDateTime now = LocalDateTime.now();
-        List<User> bannedUsers = userRepository.findByBannedUntilIsNotNullAndBannedUntilAfter(now);
-
-        return bannedUsers.stream()
-                .map(user -> new BannedUserDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getBannedUntil()
-                ))
+        return userRepository.findByBannedUntilIsNotNullAndBannedUntilAfter(now)
+                .stream()
+                .map(user -> new BannedUserDTO(user.getId(), user.getUsername(), user.getBannedUntil()))
                 .collect(Collectors.toList());
-    }
-
-    private void cleanupExpiredBans() {
-        LocalDateTime now = LocalDateTime.now();
-        List<User> expiredBans = userRepository.findUsersWithExpiredBans(now);
-
-        for (User user : expiredBans) {
-            user.setBannedUntil(null);
-            userRepository.save(user);
-        }
     }
 }
