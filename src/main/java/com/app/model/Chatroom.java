@@ -38,7 +38,6 @@ public class Chatroom {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // Many-to-Many relation with User
     @ManyToMany
     @JoinTable(
             name = "user_chatrooms",
@@ -64,5 +63,4 @@ public class Chatroom {
         }
         return name;
     }
-
 }

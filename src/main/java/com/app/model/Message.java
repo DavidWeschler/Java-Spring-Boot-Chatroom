@@ -41,7 +41,4 @@ public class Message {
     public String getSenderName() {
         return sender != null ? sender.getUsername() : "Unknown";
     }
-
-    public void setFile(File file) { this.file = file; }
-
 }
