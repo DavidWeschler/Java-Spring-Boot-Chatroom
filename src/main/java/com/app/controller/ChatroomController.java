@@ -305,4 +305,11 @@ public class ChatroomController {
         System.out.println("DEBUG: editNameParam = " + editNameParam);
         return "chatroom-manage";
     }
+
+    @GetMapping("/{id}/leave-confirm")
+    public String confirmLeave(@PathVariable Long id, Model model) {
+        chatroomService.requireMembershipOrThrow(id);
+        model.addAttribute("chatroomId", id);
+        return "chatroom-leave-confirm";
+    }
 }
