@@ -1,7 +1,6 @@
 package com.app.listeners;
 
 import com.app.dto.PresenceMessage;
-import com.app.model.User;
 import com.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -40,22 +39,16 @@ public class WebSocketEventListener {
         Principal user = accessor.getUser();
         Long chatroomId = extractChatroomId(accessor);
 
-        System.out.println("new user connected: " + (user != null ? user.getName() : "anonymous") +
-                           " to chatroom: " + chatroomId);
-
         if (user != null && chatroomId != null) {
             String userId = user.getName();
             String sessionId = accessor.getSessionId();
 
             chatroomUsers.computeIfAbsent(chatroomId, k -> ConcurrentHashMap.newKeySet()).add(userId);
-            sessionChatroomMap.put(sessionId, chatroomId); // Map session to chatroom for disconnect handling
+            sessionChatroomMap.put(sessionId, chatroomId);
 
             String username = userService.getDisplayNameByGoogleId(userId);
-
             messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
                     new PresenceMessage(username, "JOIN"));
-
-            System.out.println("[WebSocket] " + username + " joined chatroom " + chatroomId);
         }
     }
 
@@ -65,9 +58,6 @@ public class WebSocketEventListener {
         Principal user = accessor.getUser();
         String sessionId = accessor.getSessionId();
         Long chatroomId = sessionChatroomMap.remove(sessionId);
-
-        System.out.println("user disconnected: " + (user != null ? user.getName() : "anonymous") +
-                           " from chatroom: " + chatroomId);
 
         if (user != null && chatroomId != null) {
             String userId = user.getName();
@@ -81,16 +71,12 @@ public class WebSocketEventListener {
             }
 
             String username = userService.getDisplayNameByGoogleId(userId);
-
             messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
                     new PresenceMessage(username, "LEAVE"));
-
-            System.out.println("[WebSocket] " + username + " left chatroom " + chatroomId);
         }
     }
 
     public Set<String> getConnectedUsers(Long chatroomId) {
-        System.out.println("[WebSocket] Fetching connected users for chatroom " + chatroomId);
         return chatroomUsers.getOrDefault(chatroomId, Collections.emptySet());
     }
 
@@ -102,5 +88,4 @@ public class WebSocketEventListener {
         messagingTemplate.convertAndSend("/topic/presence/" + chatroomId,
                 new PresenceMessage(username, "JOIN"));
     }
-
 }

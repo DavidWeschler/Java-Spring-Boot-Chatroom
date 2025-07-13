@@ -78,5 +78,4 @@ public class User {
         if (days >= 1) return "24 hours";
         return "less than a day";
     }
-
 }
