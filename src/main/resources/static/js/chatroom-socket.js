@@ -72,7 +72,7 @@ async function uploadFile(file) {
     formData.append("file", file);
 
     try {
-        const response = await fetch(`/chatrooms/${chatroomId}/upload`, {
+        const response = await fetch(`/files/${chatroomId}/upload`, {
             method: "POST",
             body: formData
         });

@@ -156,10 +156,10 @@
                         <div th:if="${msg.file.mimeType != null}">
                             <div th:if="${#strings.startsWith(msg.file.mimeType, 'image/')}">
                                 <img class="image-preview"
-                                     th:src="@{/chatrooms/files/{id}/download(id=${msg.file.id})}" />
+                                     th:src="@{/files/{id}/download(id=${msg.file.id})}" />
                             </div>
                         </div>
-                        <a th:href="@{/chatrooms/files/{id}/download(id=${msg.file.id})}"
+                        <a th:href="@{/files/{id}/download(id=${msg.file.id})}"
                            th:text="${msg.file.filename}" download></a>
                     </div>
 
@@ -305,9 +305,9 @@
 
         const fileLink = msg.fileId && msg.filename
             ? msg.filename.endsWith('.jpg') || msg.filename.endsWith('.png') || msg.filename.endsWith('.jpeg') || msg.filename.endsWith('.gif')
-                ? `<img class="image-preview" src="/chatrooms/files/${msg.fileId}/download"
+                ? `<img class="image-preview" src="/files/${msg.fileId}/download"
                     style="max-width: 100px; max-height: 100px; margin-top: 0.5rem;" />`
-                : `<a href="/chatrooms/files/${msg.fileId}/download" download>${msg.filename}</a>`
+                : `<a href="/files/${msg.fileId}/download" download>${msg.filename}</a>`
             : "";
 
         messageRow.innerHTML = `
@@ -342,7 +342,7 @@
         formData.append("file", file);
 
         try {
-            const response = await fetch(`/chatrooms/${chatroomId}/upload`, {
+            const response = await fetch(`/files/${chatroomId}/upload`, {
                 method: "POST",
                 body: formData
             });

@@ -81,12 +81,12 @@
                 <div class="mb-2">
                     ${msg.fileMimeType?.startsWith('image/') ? `
                         <img class="image-preview"
-                             src="/chatrooms/files/${msg.fileId}/download"
+                             src="/files/${msg.fileId}/download"
                              alt="${msg.fileName}"
                              onerror="this.style.display='none'" />
                     ` : ''}
                     <div>
-                        <a href="/chatrooms/files/${msg.fileId}/download" download>${msg.fileName}</a>
+                        <a href="/files/${msg.fileId}/download" download>${msg.fileName}</a>
                     </div>
                 </div>
             ` : '';

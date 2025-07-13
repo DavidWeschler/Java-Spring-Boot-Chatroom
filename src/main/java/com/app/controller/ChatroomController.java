@@ -57,66 +57,6 @@ public class ChatroomController {
     @Autowired
     private ReportRepository reportRepository;
 
-    @PostMapping("/{chatroomId}/upload")
-    @ResponseBody
-    public ResponseEntity<?> uploadFile(
-            @PathVariable Long chatroomId,
-            @RequestParam("file") MultipartFile multipartFile) {
-
-        System.out.println("DEBUG: Upload requested for chatroomId = " + chatroomId);
-
-        // Ensure user is member of chatroom
-        User user = chatroomService.requireMembershipOrThrow(chatroomId);
-
-        try {
-            File file = fileService.saveFile(multipartFile);
-            return ResponseEntity.ok().body(Map.of(
-                    "fileId", file.getId(),
-                    "filename", file.getFilename()
-            ));
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("File upload failed: " + e.getMessage());
-        }
-    }
-
-
-    @GetMapping("/files/{id}/download")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id) {
-        System.out.println("DEBUG: Download requested for file id = " + id);
-
-        File file = fileService.getFileById(id);
-
-        if (file == null) {
-            System.out.println("DEBUG: No file found for id = " + id);
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                    .body("File wasn't available on site (not found)".getBytes(StandardCharsets.UTF_8));
-        }
-
-        System.out.println("DEBUG: File found: " + file.getFilename());
-
-        if (file.getFileData() == null) {
-            System.out.println("DEBUG: fileData is NULL for id = " + id);
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                    .body("File wasn't available on site (no data)".getBytes(StandardCharsets.UTF_8));
-        }
-
-        System.out.println("DEBUG: File size = " + file.getFileData().length + " bytes");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename(file.getFilename(), StandardCharsets.UTF_8)
-                .build());
-
-        return new ResponseEntity<>(file.getFileData(), headers, HttpStatus.OK);
-    }
-
-
     @GetMapping("/conversations/start")
     public String showStartConversationPage(@RequestParam(value = "query", required = false) String query, Model model) {
         User currentUser = currentUserService.getCurrentAppUser();
