@@ -37,7 +37,6 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
             boolean allowed = ALLOWED_PATHS_FOR_ADMIN.stream().anyMatch(path::startsWith);
 
             if (!allowed) {
-                System.out.println("AdminAccessInterceptor: Blocking access to " + path);
                 response.sendRedirect("/home");
                 return false;
             }
@@ -46,4 +45,3 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
         return true;
     }
 }
-// begin cleanup

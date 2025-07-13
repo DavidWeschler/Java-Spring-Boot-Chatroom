@@ -24,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/css/**", "/js/**", "/img/**",
-                        "/oauth2/**", "/error" // static and auth endpoints
+                        "/oauth2/**", "/error"
                 );
     }
 }

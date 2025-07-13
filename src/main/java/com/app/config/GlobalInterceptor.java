@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-// @Configuration
 public class GlobalInterceptor implements HandlerInterceptor {
 
     private final UserSessionBean userSessionBean;
@@ -18,19 +17,15 @@ public class GlobalInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getRequestURI();
 
-        /**
-         * CHECK IF WE NEED THE js AND CSS
-         */
-        // Allow access to login, oauth, static resources:
-        if (path.startsWith("/login") || path.startsWith("/oauth2") || path.startsWith("/css") || path.startsWith("/js") || path.equals("/") || path.startsWith("/banned")) {
-            // If already logged in → redirect /login to /home
-            if ((path.startsWith("/login") || path.equals("/")) && userSessionBean.isLoggedIn()) {
+        if (isPublicPath(path)) {
+            if ((path.equals("/") || path.startsWith("/login")) && userSessionBean.isLoggedIn()) {
                 response.sendRedirect("/home");
                 return false;
             }
             return true;
         }
 
+        // Special case: logout-confirm requires authentication
         if (path.startsWith("/logout-confirm")) {
             if (!userSessionBean.isLoggedIn()) {
                 response.sendRedirect("/login");
@@ -39,15 +34,26 @@ public class GlobalInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // For all other pages → check if logged in
+        // All other paths require authentication
         if (!userSessionBean.isLoggedIn()) {
             response.sendRedirect("/login");
             return false;
         }
 
-        return true; // Allow request to proceed
+//        if (userSessionBean.getUser().isBanned()) {
+//            response.sendRedirect("/banned");
+//            return false;
+//        }
+
+        return true;
     }
-    /**
-     * CHECK IF WE NEED postHandle() TOO
-     */
+
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/login") ||
+                path.startsWith("/oauth2") ||
+                path.startsWith("/css") ||
+                path.startsWith("/js") ||
+                path.startsWith("/banned") ||
+                path.equals("/");
+    }
 }
