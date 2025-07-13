@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BroadcastService {
@@ -38,8 +37,8 @@ public class BroadcastService {
     }
 
     @Transactional
-    public Optional<BroadcastMessage> updateContent(User admin, Long id, String newContent) {
-        return repository.findById(id).filter(msg ->
+    public void updateContent(User admin, Long id, String newContent) {
+        repository.findById(id).filter(msg ->
                 msg.getAdmin().equals(admin) && !msg.isExpired()
         ).map(msg -> {
             msg.setContent(newContent);
@@ -47,12 +46,12 @@ public class BroadcastService {
         });
     }
 
-    public boolean delete(User admin, Long id) {
-        return repository.findById(id).filter(msg ->
+    public void delete(User admin, Long id) {
+        repository.findById(id).filter(msg ->
                 msg.getAdmin().equals(admin) && !msg.isExpired()
         ).map(msg -> {
             repository.delete(msg);
             return true;
-        }).orElse(false);
+        });
     }
 }

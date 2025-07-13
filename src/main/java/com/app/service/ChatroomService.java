@@ -124,8 +124,7 @@ public class ChatroomService {
         chatroom.setCreatedBy(creator);
         chatroom.getMembers().add(creator);
 
-        Chatroom savedChatroom = chatroomRepository.save(chatroom);
-        return savedChatroom;
+        return chatroomRepository.save(chatroom);
     }
 
     public boolean isUserMemberOfChatroom(Long chatroomId, Long useId) {
@@ -168,10 +167,8 @@ public class ChatroomService {
         List<Chatroom> existingChats = chatroomRepository.findPrivateChatByMembers(memberIds, memberIds.size(), ChatroomType.PRIVATE);
 
         if (!existingChats.isEmpty()) {
-            System.out.println("Found existing private chatroom for users: " + myUser.getUsername() + " and " + otherUser.getUsername());
             return existingChats.get(0);
         }
-        System.out.println("Creating new private chatroom for users: " + myUser.getUsername() + " and " + otherUser.getUsername());
 
         Chatroom chatroom = new Chatroom();
         chatroom.setName(myUser.getUsername() + " & " + otherUser.getUsername());

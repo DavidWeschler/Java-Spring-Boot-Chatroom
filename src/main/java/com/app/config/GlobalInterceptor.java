@@ -22,19 +22,14 @@ public class GlobalInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getRequestURI();
 
-        // Publicly accessible endpoints
-        if (path.startsWith("/login") || path.startsWith("/oauth2") ||
-                path.startsWith("/css") || path.startsWith("/js") ||
-                path.equals("/") || path.startsWith("/img") || path.startsWith("/banned")) {
-
-            if ((path.startsWith("/login") || path.equals("/")) && userSessionBean.isLoggedIn()) {
+        if (isPublicPath(path)) {
+            if ((path.equals("/") || path.startsWith("/login")) && userSessionBean.isLoggedIn()) {
                 response.sendRedirect("/home");
                 return false;
             }
             return true;
         }
 
-        // Require login for everything else
         if (!userSessionBean.isLoggedIn()) {
             response.sendRedirect("/login");
             return false;
@@ -54,5 +49,14 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
 
         return true;
+    }
+
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/login") ||
+        path.startsWith("/oauth2") ||
+        path.startsWith("/css") ||
+        path.startsWith("/js") ||
+        path.startsWith("/banned") ||
+                path.equals("/");
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class CurrentUserService {
 
@@ -23,15 +22,12 @@ public class CurrentUserService {
         return null;
     }
 
-    /** New helper: returns your app’s User entity or null if anonymous */
     public User getCurrentAppUser() {
         OAuth2User oAuth = getCurrentUser();
         if (oAuth == null) {
-            System.out.println("DEBUG: No authenticated user found.");
             return null;
         }
-        String email = oAuth.getAttribute("email");   // adjust key if provider differs
+        String email = oAuth.getAttribute("email");
         return email == null ? null : userRepository.findByEmail(email).orElse(null);
     }
-
 }

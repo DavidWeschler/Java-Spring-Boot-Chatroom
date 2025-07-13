@@ -19,7 +19,7 @@ public class UserSessionBean {
 
     @Setter
     private boolean loggedIn;
-    private Deque<Long> recentChatrooms = new LinkedList<>();
+    private final Deque<Long> recentChatrooms = new LinkedList<>();
     @Setter
     private User user;
 

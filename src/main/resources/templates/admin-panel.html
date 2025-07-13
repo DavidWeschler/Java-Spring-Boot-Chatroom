@@ -74,7 +74,6 @@
             let latestTimestamp = lastUpdated;
 
             data.forEach(msg => {
-                // Track max updatedAt
                 if (msg.updatedAt > latestTimestamp) latestTimestamp = msg.updatedAt;
 
                 const fileHtml = msg.fileId && msg.fileName ? `

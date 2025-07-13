@@ -11,18 +11,15 @@ import java.time.LocalDateTime;
 
 @Service
 public class FileService {
-    private final FileRepository fileRepository;
 
     @Autowired
-    public FileService(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
-    }
+    private FileRepository fileRepository;
 
     public File saveFile(MultipartFile multipartFile) throws IOException {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return null;
         }
-        String mimeType = multipartFile.getContentType(); // e.g. image/png
+        String mimeType = multipartFile.getContentType();
         File file = new File();
         file.setFilename(multipartFile.getOriginalFilename());
         file.setFileData(multipartFile.getBytes());

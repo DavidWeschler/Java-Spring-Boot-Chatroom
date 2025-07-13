@@ -40,8 +40,4 @@ public class ReportService {
     private boolean isUserInChatroom(User user, Chatroom chatroom) {
         return chatroom.getMembers().contains(user);
     }
-
-    public boolean hasAlreadyReported(User reporter, Message message) {
-        return reportRepository.existsByReporterAndReportedMessage(reporter, message);
-    }
 }
