@@ -10,8 +10,6 @@ public class ChatMessageDTO {
     private Long chatroomId;
     private Long fromId;
     private Long id;
-
-    // Optional file metadata (sent only if a file is attached)
     private Long fileId;
     private String filename;
     private String mimeType;

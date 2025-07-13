@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
     @Autowired
     private ReportRepository reportRepository;
 
@@ -43,8 +43,6 @@ public class AdminController {
 
     @GetMapping("/panel")
     public String adminPanel(Model model) {
-        System.out.println("entering adminPanel");
-
         List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
 
         for (Message msg : reportedMessages) {
@@ -53,34 +51,16 @@ public class AdminController {
         }
 
         model.addAttribute("reportedMessages", reportedMessages);
-
         cleanupExpiredBans();
 
         return "admin-panel";
     }
 
-//    @PostMapping("/block-user/{userId}")
-//    public String blockUser(@PathVariable Long userId) {
-//        User user = userRepository.findById(userId).orElseThrow();
-//        user.setRole("BLOCKED");
-//        userRepository.save(user);
-//        return "redirect:/admin/panel";
-//    }
-
     @PostMapping("/ban-user/{msgId}")
     public String banUser(@PathVariable Long msgId, @RequestParam String duration) {
-        System.out.println("Banning user for message ID: " + msgId + " with duration: " + duration);
         userService.banUserByMessageId(msgId, duration);
         return "redirect:/admin/panel";
     }
-
-//    @PostMapping("/dismiss-report/{reportId}")
-//    public String dismissReport(@PathVariable Long reportId) {
-//        Report report = reportRepository.findById(reportId).orElseThrow();
-//        report.setStatus(ReportStatus.DISMISSED);
-//        reportRepository.save(report);
-//        return "redirect:/admin/panel";
-//    }
 
     @PostMapping("/dismiss-message-reports/{messageId}")
     public String dismissAllReportsOnMessage(@PathVariable Long messageId) {
@@ -96,15 +76,6 @@ public class AdminController {
         return "redirect:/admin/panel";
     }
 
-//    @GetMapping("/panel/banned-users")
-//    @ResponseBody
-//    public List<BannedUserDTO> getBannedUsers() {
-//        return userRepository.findAll().stream()
-//                .filter(user -> user.getBannedUntil() != null)
-//                .map(user -> new BannedUserDTO(user.getId(), user.getUsername(), user.getBannedUntil()))
-//                .toList();
-//    }
-
     @GetMapping("/panel/reports")
     @ResponseBody
     public List<MessageReportDTO> getLatestReports(@RequestParam(required = false) String since) {
@@ -114,15 +85,12 @@ public class AdminController {
         try {
             sinceTime = Instant.parse(since).atZone(ZoneId.systemDefault()).toLocalDateTime();
         } catch (Exception e) {
-            System.out.println("Invalid 'since' format: " + since);
-            return dtos; // empty list
+            return dtos;
         }
 
-        // ✅ If no report was updated since, return nothing
         boolean anyChanged = reportRepository.existsByUpdatedAtAfter(sinceTime);
         if (!anyChanged) return dtos;
 
-        // ✅ Return all currently active (non-dismissed) reported messages
         List<Message> reportedMessages = reportRepository.findDistinctReportedMessagesWithActiveReports();
 
         for (Message msg : reportedMessages) {
@@ -166,10 +134,6 @@ public class AdminController {
         return dtos;
     }
 
-
-    /**
-     * AJAX endpoint to get currently banned users
-     */
     @GetMapping("/panel/banned-users")
     @ResponseBody
     public List<BannedUserDTO> getBannedUsers() {
@@ -185,9 +149,6 @@ public class AdminController {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Clean up expired bans by setting banned_until to null
-     */
     private void cleanupExpiredBans() {
         LocalDateTime now = LocalDateTime.now();
         List<User> expiredBans = userRepository.findUsersWithExpiredBans(now);

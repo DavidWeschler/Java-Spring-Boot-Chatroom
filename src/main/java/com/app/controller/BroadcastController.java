@@ -1,6 +1,5 @@
 package com.app.controller;
 
-import com.app.model.BroadcastMessage;
 import com.app.model.User;
 import com.app.service.BroadcastService;
 import com.app.service.CurrentUserService;

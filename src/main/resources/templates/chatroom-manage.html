@@ -15,9 +15,7 @@
     <div class="mb-4 d-flex flex-column flex-md-row gap-2">
         <a th:href="@{/chatrooms/{id}/view-chatroom(id=${chatroom.id})}" class="btn btn-outline-light">Back</a>
 
-        <form th:action="@{/chatrooms/leave/{id}(id=${chatroomId})}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-outline-danger">Leave Chatroom</button>
-        </form>
+        <a th:href="@{/chatrooms/{id}/leave-confirm(id=${chatroomId})}" class="btn btn-outline-danger">Leave Chatroom</a>
     </div>
 
     <div class="bg-secondary-subtle rounded p-4 text-dark shadow-sm mb-4">
