@@ -25,7 +25,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // Special case: logout-confirm requires authentication
+        // logout-confirm requires authentication
         if (path.startsWith("/logout-confirm")) {
             if (!userSessionBean.isLoggedIn()) {
                 response.sendRedirect("/login");

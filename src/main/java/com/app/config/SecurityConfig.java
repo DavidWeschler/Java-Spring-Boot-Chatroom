@@ -32,7 +32,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/logout-success") // ensure this page exists
+                        .logoutSuccessUrl("/logout-success")
                         .permitAll()
                 );
 
