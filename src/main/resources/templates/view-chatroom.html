@@ -29,7 +29,12 @@
         </div>
         <div>
             <a href="/chatrooms" class="btn btn-outline-light btn-sm">Back</a>
-            <a th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}" class="btn btn-outline-light btn-sm">Manage</a>
+            <a th:if="${chatroomType != 'PRIVATE'}"
+               th:href="@{/chatrooms/{id}/manage(id=${chatroomId})}"
+               class="btn btn-outline-light btn-sm">
+                Manage
+            </a>
+
         </div>
     </div>
 
@@ -95,33 +100,8 @@
 
 <footer th:replace="~{fragments/footer.html :: footer}"></footer>
 
-<!-- Auto-scroll to bottom -->
-<script>
-    const chatBox = document.getElementById("chatBox");
-    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-</script>
-
-<!-- Show selected file name -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const fileInput = document.querySelector('.chat-input-area input[type="file"]');
-        const fileNameDisplay = document.getElementById('selectedFileName');
-
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                fileNameDisplay.textContent = fileInput.files[0].name;
-            } else {
-                fileNameDisplay.textContent = "";
-            }
-        });
-    });
-</script>
-
-<script th:inline="javascript">
-    window.reportedByMeIds = /*[[${reportedByMeIds}]]*/ [];
-</script>
+<script src="/js/view-chatroom.js"></script>
 <script src="/js/websocket.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

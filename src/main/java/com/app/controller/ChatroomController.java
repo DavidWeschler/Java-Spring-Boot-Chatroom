@@ -382,6 +382,9 @@ public class ChatroomController {
         boolean editNameMode = "true".equalsIgnoreCase(editNameParam);
         chatroomService.requireMembershipOrThrow(chatroomId);
         Chatroom chatroom = chatroomService.findById(chatroomId).orElseThrow(() -> new ResourceNotFoundException("Chatroom not found with id: " + chatroomId));
+        if (chatroom.getType() == ChatroomType.PRIVATE) {
+            return "redirect:/home";
+        }
         model.addAttribute("chatroomId", chatroomId);
         model.addAttribute("chatroomType", chatroom.getType().toString());
         List<User> members = chatroomService.getChatroomMembers(chatroomId);

@@ -1,11 +1,8 @@
 package com.app.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * GlobalExceptionHandler handles exceptions thrown by the application.
@@ -15,51 +12,30 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /** Handles ResourceNotFoundException and returns a 404 response.
-     *
-     * @param ex the exception thrown
-     * @return a ResponseEntity with the error details
+    /**
+     * Handles ResourceNotFoundException and returns error.html with 404 status code.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    public String handleNotFound(ResourceNotFoundException ex, Model model) {
+        model.addAttribute("statusCode", HttpStatus.NOT_FOUND.value());
+        return "error";
     }
 
     /**
-     * Handles ForbiddenException and returns a 403 response.
-     *
-     * @param ex the exception thrown
-     * @return a ResponseEntity with the error details
+     * Handles ForbiddenException and returns error.html with 403 status code.
      */
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<?> handleForbidden(ForbiddenException ex) {
-        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    public String handleForbidden(ForbiddenException ex, Model model) {
+        model.addAttribute("statusCode", HttpStatus.FORBIDDEN.value());
+        return "error";
     }
 
     /**
-     * Handles all other exceptions and returns a 500 response.
-     *
-     * @param ex the exception thrown
-     * @return a ResponseEntity with the error details
+     * Handles all other exceptions and returns error.html with 500 status code.
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-    }
-
-    /**
-     * Builds a standardized error response.
-     *
-     * @param status the HTTP status
-     * @param message the error message
-     * @return a ResponseEntity containing the error details
-     */
-    private ResponseEntity<?> buildResponse(HttpStatus status, String message) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("status", status.value());
-        error.put("error", status.getReasonPhrase());
-        error.put("message", message);
-        return new ResponseEntity<>(error, status);
+    public String handleGeneric(Exception ex, Model model) {
+        model.addAttribute("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return "error";
     }
 }
