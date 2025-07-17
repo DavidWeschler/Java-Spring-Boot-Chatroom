@@ -56,6 +56,16 @@ public class Chatroom implements Serializable {
     private Set<User> members = new HashSet<>();
 
     /**
+     * Returns the number of members in the chatroom.
+     *
+     * @return the number of members
+     */
+    @Transient
+    public int numOfMembers() {
+        return members == null ? 0 : members.size();
+    }
+
+    /**
      * Adds a member to the chatroom.
      *
      * @param currentUser the user to be added as a member

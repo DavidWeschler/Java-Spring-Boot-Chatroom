@@ -15,7 +15,7 @@
                 <div class="card-body overflow-auto">
                     <h4 class="card-title mb-4">Recently Visited Chatrooms</h4>
                     <div th:if="${#lists.isEmpty(recentChatrooms)}" class="text-muted">
-                        You haven’t visited any chatrooms yet.
+                        You haven’t visited any chatrooms recently.
                     </div>
                     <div class="list-group" th:unless="${#lists.isEmpty(recentChatrooms)}">
                         <div th:each="chat : ${recentChatrooms}"
@@ -42,7 +42,8 @@
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h4 class="card-title mb-4">Welcome!</h4>
                     <p><strong>Name:</strong> <span th:text="${name}"></span></p>
-                    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+<!--                    <p><strong>Email:</strong> <span th:text="${email}"></span></p>-->
+                    <p><strong>Email:</strong> <span th:text="'Censored for the video'" class="fst-italic text-secondary"></span></p>
                     <a href="/logout" class="btn btn-outline-danger mt-3">Logout</a>
                 </div>
             </div>

@@ -46,8 +46,8 @@
         </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(communities)}" class="text-white">
-        <p>No public communities available.</p>
+    <div th:if="${query != null and !#strings.isEmpty(query) and #lists.isEmpty(communities)}" class="text-white">
+        <p>No public communities found.</p>
     </div>
 
     <div th:if="${!#lists.isEmpty(communities)}" class="mt-5">

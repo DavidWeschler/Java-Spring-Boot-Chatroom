@@ -21,8 +21,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByGoogleId(String googleId);
 
-    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) AND u.role <> 'ADMIN'")
-    List<User> searchNonAdminUsers(@Param("query") String query);
+    @Query("SELECT u FROM User u WHERE " +
+            "LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "AND u.role <> 'ADMIN' " +
+            "AND u.id <> :currentUserId")
+    List<User> searchNonAdminUsers(@Param("query") String query, @Param("currentUserId") Long currentUserId);
 
     List<User> findByBannedUntilIsNotNullAndBannedUntilAfter(LocalDateTime now);
 

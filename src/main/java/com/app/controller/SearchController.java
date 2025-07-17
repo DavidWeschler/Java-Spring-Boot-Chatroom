@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -54,21 +55,25 @@ public class SearchController {
         }
 
         User currentUser = currentUserService.getCurrentAppUser();
-        List<User> users = userRepository.searchNonAdminUsers(query).stream()
-                .filter(u -> !u.getId().equals(currentUser.getId()))
-                .toList();        model.addAttribute("users", users);
+        Long currentUserId = currentUser.getId();
 
-        model.addAttribute("query", query);
+        // Retrieve non-admin users matching the query, excluding the current user
+        List<User> users = userRepository.searchNonAdminUsers(query, currentUserId);
+        model.addAttribute("users", users);
 
+        // Retrieve messages matching the query in user's chats
         List<Message> messagesInUsersChats = messageRepository.searchMessagesInUsersChats(query);
         model.addAttribute("messages", messagesInUsersChats);
+
+        model.addAttribute("query", query);
 
         return "search";
     }
 
     /**
      * Starts a conversation search based on the provided query.
-     * Retrieves non-admin users matching the query and adds them to the model.
+     * Retrieves non-admin users matching the query and adds them to the model,
+     * excluding the currently logged-in user.
      *
      * @param query the search query
      * @param model the model to add attributes for the view
@@ -76,7 +81,11 @@ public class SearchController {
      */
     @GetMapping("/start-convo-search")
     public String startConvoSearch(@RequestParam("query") String query, Model model) {
-        List<User> users = userRepository.searchNonAdminUsers(query);
+        User currentUser = currentUserService.getCurrentAppUser();
+        Long currentUserId = currentUser.getId();
+
+        // Retrieve non-admin users matching the query, excluding the current user
+        List<User> users = userRepository.searchNonAdminUsers(query, currentUserId);
         model.addAttribute("users", users);
         model.addAttribute("query", query);
 

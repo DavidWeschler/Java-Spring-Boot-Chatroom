@@ -89,9 +89,11 @@ public class ChatroomController {
     public String showStartConversationPage(@RequestParam(value = "query", required = false) String query, Model model) {
         User currentUser = currentUserService.getCurrentAppUser();
         List<User> users = List.of();
+
         if (query != null && !query.trim().isEmpty()) {
-            userRepository.searchNonAdminUsers(query);
+            users = userRepository.searchNonAdminUsers(query, currentUser.getId());
         }
+
         model.addAttribute("query", query);
         model.addAttribute("users", users);
         return "start-conversation";
