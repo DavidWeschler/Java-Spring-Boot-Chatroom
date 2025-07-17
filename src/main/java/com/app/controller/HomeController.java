@@ -1,8 +1,11 @@
 package com.app.controller;
 
+import com.app.exception.ResourceNotFoundException;
 import com.app.model.BroadcastMessage;
 import com.app.model.Chatroom;
+import com.app.model.User;
 import com.app.repo.ChatroomRepository;
+import com.app.repo.UserRepository;
 import com.app.service.BroadcastService;
 import com.app.service.CurrentUserService;
 import com.app.session.UserSessionBean;
@@ -12,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * HomeController handles requests for the home page and logout confirmation.
@@ -45,6 +50,12 @@ public class HomeController {
     private BroadcastService broadcastService;
 
     /**
+     * Repository to access user data.
+     */
+    @Autowired
+    private UserRepository userRepository;
+
+    /**
      * Displays the home page with the current user's information, recent chatrooms,
      * and active broadcast messages.
      *
@@ -53,14 +64,17 @@ public class HomeController {
      */
     @GetMapping("/home")
     public String home(Model model) {
-        OAuth2User user = currentUserService.getCurrentUser();
-        if (user != null) {
-            model.addAttribute("name", user.getAttribute("name"));
-            model.addAttribute("email", user.getAttribute("email"));
-        }
+        OAuth2User currentUser = currentUserService.getCurrentUser();
+        User user = userRepository.findByEmail(currentUser.getAttribute("email")).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUser.getAttribute("email")));
+
+        model.addAttribute("name", currentUser.getAttribute("name"));
+        model.addAttribute("email", currentUser.getAttribute("email"));
 
         List<Long> recentIds = userSession.getRecentChatrooms();
         List<Chatroom> recentChatrooms = chatroomRepository.findAllById(recentIds);
+        Map<Long, String> displayNames = recentChatrooms.stream().collect(Collectors.toMap(Chatroom::getId,c -> c.getDisplayName(user)));
+
+        model.addAttribute("displayNames", displayNames);
         model.addAttribute("recentChatrooms", recentChatrooms);
 
         List<BroadcastMessage> broadcasts = broadcastService.getActiveMessages();

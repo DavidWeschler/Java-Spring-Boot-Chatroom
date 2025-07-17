@@ -21,7 +21,7 @@
                         <div th:each="chat : ${recentChatrooms}"
                              class="list-group-item d-flex justify-content-between align-items-center border-bottom bg-light-subtle text-dark">
                             <div>
-                                <strong th:text="${chat.name}">Chatroom Name</strong>
+                                <strong th:text="${displayNames[chat.id] ?: chat.name}">Chatroom Name</strong>
                                 <span class="ms-2 badge"
                                       th:switch="${chat.type.name()}">
                                     <span th:case="'GROUP'" class="bg-info text-dark">Group</span>
