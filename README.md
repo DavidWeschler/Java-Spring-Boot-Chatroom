@@ -28,13 +28,13 @@ Watch the full demo on [YouTube](https://www.youtube.com/watch?v=PLACEHOLDER)
 
 | Login Page        | Home Page             | Messaging Interface     |
 | ----------------- | --------------------- | ----------------------- |
-| [screenshot 1]    | [screenshot 2]        | [screenshot 3]          |
+| ![](src/main/resources/static/screenshots/login.png) | ![](src/main/resources/static/screenshots/home.png) | ![](src/main/resources/static/screenshots/myChats.png) |
 | Community Browser | Chatroom Management   | Message Report Page     |
-| [screenshot 4]    | [screenshot 5]        | [screenshot 6]          |
+| ![](src/main/resources/static/screenshots/discover.png) | ![](src/main/resources/static/screenshots/manage.png) | ![](src/main/resources/static/screenshots/report.png) |
 | File Upload Flow  | Admin Report Panel    | Broadcast Creation Page |
-| [screenshot 7]    | [screenshot 8]        | [screenshot 9]          |
-| Banned Notice     | Admin Home Restricted | Polling Active Cards    |
-| [screenshot 10]   | [screenshot 11]       | [screenshot 12]         |
+| ![](src/main/resources/static/screenshots/file.png) | ![](src/main/resources/static/screenshots/adminPanel.png) | ![](src/main/resources/static/screenshots/broadcast.png) |
+| Banned Page       |                       |                         |
+| ![](src/main/resources/static/screenshots/banned.png) |                         |                         |
 
 ---
 
