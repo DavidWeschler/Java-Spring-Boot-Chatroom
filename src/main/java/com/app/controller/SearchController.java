@@ -62,7 +62,7 @@ public class SearchController {
         model.addAttribute("users", users);
 
         // Retrieve messages matching the query in user's chats
-        List<Message> messagesInUsersChats = messageRepository.searchMessagesInUsersChats(query);
+        List<Message> messagesInUsersChats = messageRepository.searchMessagesInUsersChats(query, currentUserId);
         model.addAttribute("messages", messagesInUsersChats);
 
         model.addAttribute("query", query);

@@ -19,10 +19,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByChatroomOrderByTimestampAsc(Chatroom chatroom);
 
     @Query("""
-    SELECT m
-    FROM Message m
-    WHERE LOWER(m.content) LIKE LOWER(CONCAT('%', :query, '%'))
+    SELECT m FROM Message m
+    JOIN m.chatroom c
+    JOIN c.members u
+    WHERE u.id = :userId
+      AND LOWER(m.content) LIKE LOWER(CONCAT('%', :query, '%'))
     ORDER BY m.timestamp DESC
     """)
-    List<Message> searchMessagesInUsersChats(@Param("query") String query);
+    List<Message> searchMessagesInUsersChats(@Param("query") String query, @Param("userId") Long userId);
+
 }
