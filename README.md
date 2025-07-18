@@ -70,10 +70,9 @@ The MySQL database server will now be accessible on `localhost:3306`.
 
 ### 3. Initialize the SQL Database
 
-- In the same directory as this README, there is a file named `ex4.sql`
 - Open [phpMyAdmin](http://localhost/phpmyadmin)
 - Create a new database named `ex4`
-- Import the SQL file using the **Import** tab in phpMyAdmin
+- If you already have a ready database: name it ex4.awl and Import the SQL file using the **Import** tab in phpMyAdmin
 
 ---
 
