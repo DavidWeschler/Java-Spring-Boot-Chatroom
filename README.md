@@ -4,7 +4,7 @@
 
 This project implements a full-stack **WhatsApp-like social network** using **Spring Boot MVC**, **JPA (MySQL)**, **Spring Security**, and **Thymeleaf**. It allows users to chat via private, group, or community chatrooms, send messages and files, report inappropriate content, and for administrators to moderate users and broadcast announcements.
 
-Watch the full demo on [YouTube](https://www.youtube.com/watch?v=PLACEHOLDER)
+Watch the full demo on [YouTube](https://youtu.be/3yQcJbPibIs)
 
 ---
 
