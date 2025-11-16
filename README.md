@@ -93,7 +93,7 @@ Two admin users are included in the database via the `ex4.sql`. Initially, they 
 - `webmasterone2025@gmail.com`
 - `webmasterthree2025@gmail.com`
 
-**Password** `Web2025$`
+**Password** `*****`
 
 `NOTE`: If starting from scratch: start the program -> Login with the user you want to make an admin -> go to [phpMyAdmin](http://localhost/phpmyadmin) and go to `user` table -> manually change `Role` cloumn from `USER` to `ADMIN` -> re-run the program -> Your user is now an admin!
 
